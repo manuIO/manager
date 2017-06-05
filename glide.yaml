@@ -1,0 +1,12 @@
+package: github.com/mainflux/manager
+license: Apache License 2.0
+import:
+  - package: github.com/go-kit/kit
+    version: ~0.4.x
+  - package: github.com/go-zoo/bone
+    version: 1.2
+  - package: github.com/jinzhu/gorm
+    version: 1.0
+testImport:
+  - package: github.com/stretchr/testify
+    version: 1.1.4
