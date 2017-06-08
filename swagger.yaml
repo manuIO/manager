@@ -1,0 +1,682 @@
+swagger: "2.0"
+info:
+  title: Mainflux manager service
+  description: HTTP API for managing platform users, devices, applications and channels.
+  version: "1.0.0"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /users:
+    post:
+      summary: Registers user account
+      description: |
+        Registers new user account given email and password. New account will
+        be uniquely identified by its email address.
+      tags:
+        - users
+      parameters:
+        - name: user
+          description: JSON-formatted document describing the new user.
+          in: body
+          schema:
+            $ref: "#/definitions/User"
+          required: true
+      responses:
+        201:
+          description: Registered new user.
+        400:
+          description: |
+            Failed due to malformed JSON or using an existing email address.
+        500:
+          description: Unexpected server-side error occured.
+  /tokens:
+    post:
+      summary: User authentication
+      description: |
+        Generates an access token when provided with proper credentials.
+      tags:
+        - users
+      parameters:
+        - name: credentials
+          description: JSON-formatted document containing user credentials.
+          in: body
+          schema:
+            $ref: "#/definitions/User"
+          required: true
+      responses:
+        201:
+          description: User authenticated.
+          schema:
+            $ref: "#/definitions/Token"
+        400:
+          description: |
+            Failed due to malformed JSON or using an invalid credentials.
+        500:
+          description: Unexpected server-side error occured.
+  /apps:
+    post:
+      summary: Registers new application
+      description: |
+        Registers new application. User identified by the access token will be
+        the application owner.
+      tags:
+        - apps
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: application
+          description: JSON-formatted document describing the new application.
+          in: body
+          schema:
+            $ref: "#/definitions/App"
+          required: true
+      responses:
+        201:
+          description: Application registered.
+          headers:
+            Location:
+              type: string
+              description: Created application's relative URL (i.e. /apps/{appId}).
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          description: Unexpected server-side error occured.
+    get:
+      summary: Retrieves managed applications
+      description: |
+        Retrieves a list of managed applications. Due to performance concerns,
+        matching data is divided into subsets. The API clients must ensure that
+        the entire dataset is consumed either by making subsequent requests or
+        increasing the subset size of the initial request.
+      tags:
+        - apps
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: subset_size
+          description: Size of the subset to retrieve.
+          in: query
+          type: integer
+          default: 10
+          required: false
+        - name: subset_idx
+          description: One-based index of the subset to retrieve.
+          in: query
+          type: integer
+          default: 1
+          required: false
+      responses:
+        200:
+          description: Data retrieved.
+          headers:
+            X-Count:
+              type: integer
+              description: |
+                Number of managed applications. The clients can use this value
+                to implement their paging strategy.
+          schema:
+            $ref: "#/definitions/AppList"
+        400:
+          description: Failed due to malformed query parameters.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          description: Unexpected server-side error occured.
+  /apps/{appId}:
+    get:
+      summary: Retrieves application info
+      tags:
+        - apps
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: appId
+          description: Unique application identifier.
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: "#/definitions/App"
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Application does not exist.
+        500:
+          description: Unexpected server-side error occured.
+    put:
+      summary: Updates application info
+      description: |
+        Update is performed by replacing the current resource data with values
+        provided in a request payload. Resource's unique identifier will not be
+        affected.
+      tags:
+        - apps
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: appId
+          description: Unique application identifier.
+          in: path
+          type: integer
+          required: true
+        - name: application
+          description: JSON-formatted document describing the updated application.
+          in: body
+          schema:
+            $ref: "#/definitions/App"
+          required: true
+      responses:
+        200:
+          description: Application updated.
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Application does not exist.
+        500:
+          description: Unexpected server-side error occured.
+    delete:
+      summary: Removes an application
+      description: |
+        Removes an application. The service will ensure that the removed
+        application is unsubscribed from all of the channels.
+      tags:
+        - apps
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: appId
+          description: Unique application identifier.
+          in: path
+          type: integer
+          required: true
+      responses:
+        204:
+          description: Application removed.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Application does not exist.
+        500:
+          description: Unexpected server-side error occured.
+  /devices:
+    post:
+      summary: Registers new device
+      description: |
+        Registers new device. User identified by the provided access token will
+        be the device owner.
+      tags:
+        - devices
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: device
+          description: JSON-formatted document describing the new device.
+          in: body
+          schema:
+            $ref: "#/definitions/Device"
+          required: true
+      responses:
+        201:
+          description: Device registered.
+          headers:
+            Location:
+              type: string
+              description: Created device's relative URL (i.e. /devices/{devId}).
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          description: Unexpected server-side error occured.
+    get:
+      summary: Retrieves managed devices
+      description: |
+        Retrieves a list of managed devices. Due to performance concerns,
+        matching data is divided into subsets. The API clients must ensure that
+        the entire dataset is consumed either by making subsequent requests or
+        increasing the subset size of the initial request.
+      tags:
+        - devices
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: subset_size
+          description: Size of the subset to retrieve.
+          in: query
+          type: integer
+          default: 10
+          required: false
+        - name: subset_idx
+          description: One-based index of the subset to retrieve.
+          in: query
+          type: integer
+          default: 1
+          required: false
+      responses:
+        200:
+          description: Data retrieved.
+          headers:
+            X-Count:
+              type: integer
+              description: |
+                Number of managed devices. The clients can use this value to
+                implement their paging strategy.
+          schema:
+            $ref: "#/definitions/DeviceList"
+        400:
+          description: Failed due to malformed query parameters.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          description: Unexpected server-side error occured.
+  /devices/{devId}:
+    get:
+      summary: Retrieves device info
+      tags:
+        - devices
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: devId
+          description: Unique device identifier.
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: "#/definitions/Device"
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Device does not exist.
+        500:
+          description: Unexpected server-side error occured.
+    put:
+      summary: Updates device info
+      description: |
+        Update is performed by replacing the current resource data with values
+        provided in a request payload. Resource's unique identifier will not be
+        affected.
+      tags:
+        - devices
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: devId
+          description: Unique device identifier.
+          in: path
+          type: integer
+          required: true
+        - name: device
+          description: JSON-formatted document describing the updated device.
+          in: body
+          schema:
+            $ref: "#/definitions/Device"
+          required: true
+      responses:
+        200:
+          description: Application updated.
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Device does not exist.
+        500:
+          description: Unexpected server-side error occured.
+    delete:
+      summary: Removes a device
+      description: |
+        Removes a device. The service will ensure that the removed device is
+        unsubscribed from all of its subscribed channels.
+      tags:
+        - devices
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: devId
+          description: Unique device identifier.
+          in: path
+          type: integer
+          required: true
+      responses:
+        204:
+          description: Device removed.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Device does not exist.
+        500:
+          description: Unexpected server-side error occured.
+  /channels:
+    post:
+      summary: Creates new channel
+      description: |
+        Creates new channel. User identified by the provided access token will
+        be the channel's owner.
+      tags:
+        - channels
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: channel
+          description: JSON-formatted document describing the new channel.
+          in: body
+          schema:
+            $ref: "#/definitions/Channel"
+          required: true
+      responses:
+        201:
+          description: Channel created.
+          headers:
+            Location:
+              type: string
+              description: Created channel's relative URL (i.e. /channels/{chanId}).
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          description: Unexpected server-side error occured.
+    get:
+      summary: Retrieves managed channels
+      description: |
+        Retrieves a list of managed channels. Due to performance concerns,
+        matching data is divided into subsets. The API clients must ensure that
+        the entire dataset is consumed either by making subsequent requests or
+        increasing the subset size of the initial request.
+      tags:
+        - channels
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: subset_size
+          description: Size of the subset to retrieve.
+          in: query
+          type: integer
+          default: 10
+          required: false
+        - name: subset_idx
+          description: One-based index of the subset to retrieve.
+          in: query
+          type: integer
+          default: 1
+          required: false
+      responses:
+        200:
+          description: Data retrieved.
+          headers:
+            X-Count:
+              type: integer
+              description: |
+                Number of managed channels. The clients can use this value to
+                implement their paging strategy.
+          schema:
+            $ref: "#/definitions/ChannelList"
+        400:
+          description: Failed due to malformed query parameters.
+        403:
+          description: Missing or invalid access token provided.
+        500:
+          description: Unexpected server-side error occured.
+  /channels/{chanId}:
+    get:
+      summary: Retrieves channel info
+      tags:
+        - channels
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: chanId
+          description: Unique channel identifier.
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Data retrieved.
+          schema:
+            $ref: "#/definitions/Channel"
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Channel does not exist.
+        500:
+          description: Unexpected server-side error occured.
+    put:
+      summary: Updates channel info
+      description: |
+        Update is performed by replacing the current resource data with values
+        provided in a request payload. Resource's unique identifier will not be
+        affected.
+      tags:
+        - channels
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: chanId
+          description: Unique device identifier
+          in: path
+          type: integer
+          required: true
+        - name: channel
+          description: JSON-formatted document describing the updated channel.
+          in: body
+          schema:
+            $ref: "#/definitions/Channel"
+          required: true
+      responses:
+        200:
+          description: Channel updated.
+        400:
+          description: Failed due to malformed JSON.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Channel does not exist.
+        500:
+          description: Unexpected server-side error occured.
+    delete:
+      summary: Removes a channel
+      description: |
+        Removes a channel. The service will ensure that the subscribed apps and
+        devices are unsubscribed from the removed channel.
+      tags:
+        - channels
+      parameters:
+        - name: Authorization
+          description: User's access token.
+          in: header
+          type: string
+          required: true
+        - name: chanId
+          description: Unique channel identifier.
+          in: path
+          type: integer
+          required: true
+      responses:
+        204:
+          description: Channel removed.
+        403:
+          description: Missing or invalid access token provided.
+        404:
+          description: Channel does not exist.
+        500:
+          description: Unexpected server-side error occured.
+
+definitions:
+  AppList:
+    type: object
+    properties:
+      applications:
+        type: array
+        minItems: 0
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/App"
+    required:
+      - applications
+  App:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: |
+          Unique application identifier generated by the service. Any value
+          provided by the API clients will be ignored.
+      name:
+        type: string
+        description: |
+          Free-form application name. Note that the name does not uniquely
+          identify applications.
+      channels:
+        type: array
+        description: Identifiers of channels the application is allowed to use.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: integer
+    required:
+      - name
+  ChannelList:
+    type: object
+    properties:
+      channels:
+        type: array
+        minItems: 0
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Channel"
+    required:
+      - channels
+  Channel:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: |
+          Unique channel identifier generated by the service. Any value
+          provided by the API clients will be ignored.
+      name:
+        type: string
+        description: |
+          Free-form channel name. Note that the name does not uniquely identify
+          channels.
+      public:
+        type: boolean
+        description: If true, channel if publicly accessible.
+        default: true
+    required:
+      - name
+  DeviceList:
+    type: object
+    properties:
+      devices:
+        type: array
+        minItems: 0
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Device"
+    required:
+      - devices
+  Device:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: |
+          Unique device identifier generated by the service. Any value provided
+          by the API clients will be ignored.
+      name:
+        type: string
+        description: |
+          Free-form device name. Note that the name does not uniquely identify
+          devices.
+      description:
+        type: string
+        description: Free-form device description.
+      channels:
+        type: array
+        description: Identifiers of channels the device is allowed to use.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: integer
+    required:
+      - name
+  Token:
+    type: object
+    properties:
+      token:
+        type: string
+        description: Generated access token.
+    required:
+      - token
+  User:
+    type: object
+    properties:
+      email:
+        type: string
+        format: email
+        example: "test@example.com"
+        description: User's email address will be used as its unique identifier
+      password:
+        type: string
+        format: password
+        description: Free-form account password used for acquiring auth token(s).
+    required:
+      - email
+      - password
