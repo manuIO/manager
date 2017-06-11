@@ -4,6 +4,12 @@ networks:
   roachnet:
 
 services:
+  prometheus:
+    image: prom/prometheus:v1.7.0
+    container_name: metrics_server
+    ports:
+      - "9090:9090"
+
   roach_a:
     image: cockroachdb/cockroach:v1.0.1
     container_name: roach_a
