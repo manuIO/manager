@@ -4,7 +4,7 @@ package manager
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
 	Register(User) error
-	Login(string, string) (string, error)
+	Login(User) (string, error)
 }
 
 // NewService instantiates the domain service implementation.

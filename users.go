@@ -18,6 +18,14 @@ type User struct {
 	Password string
 }
 
+func (u *User) validate() error {
+	if u.Email == "" || u.Password == "" {
+		return ErrInvalidCredentials
+	}
+
+	return nil
+}
+
 // UserRepository specifies an API that needs to be implemented by the concrete
 // storage providers (e.g. CockroachDB repository).
 type UserRepository interface {
@@ -27,5 +35,5 @@ type UserRepository interface {
 
 	// Exists determines whether or not an account with given credentials
 	// exists in the system.
-	Exists(string, string) bool
+	Exists(User) bool
 }

@@ -31,12 +31,12 @@ func (ur *userRepositoryMock) Save(user manager.User) error {
 	return nil
 }
 
-func (ur *userRepositoryMock) Exists(email, password string) bool {
+func (ur *userRepositoryMock) Exists(user manager.User) bool {
 	ur.mu.Lock()
 	defer ur.mu.Unlock()
 
-	if val, ok := ur.users[email]; ok {
-		return val.Password == password
+	if val, ok := ur.users[user.Email]; ok {
+		return val.Password == user.Password
 	}
 
 	return false

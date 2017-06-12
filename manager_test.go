@@ -21,6 +21,8 @@ func TestRegister(t *testing.T) {
 	}{
 		{manager.User{"foo@bar.com", "pass"}, nil},
 		{manager.User{"foo@bar.com", "pass"}, manager.ErrConflict},
+		{manager.User{"", "pass"}, manager.ErrInvalidCredentials},
+		{manager.User{"abc@bar.com", ""}, manager.ErrInvalidCredentials},
 		{manager.User{"abc@bar.com", "pass"}, nil},
 	}
 
@@ -41,7 +43,7 @@ func TestLogin(t *testing.T) {
 	}
 
 	for _, tt := range cases {
-		k, e := svc.Login(tt.user.Email, tt.user.Password)
+		k, e := svc.Login(tt.user)
 		assert.Equal(t, tt.key, k, "unexpected key retrieved")
 		assert.Equal(t, tt.err, e, "unexpected error occurred")
 	}
