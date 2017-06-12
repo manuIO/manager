@@ -13,6 +13,7 @@ type userRepositoryMock struct {
 	users map[string]*manager.User
 }
 
+// NewUserRepositoryMock creates test-friendly repository implementation.
 func NewUserRepositoryMock() manager.UserRepository {
 	return &userRepositoryMock{
 		users: make(map[string]*manager.User),

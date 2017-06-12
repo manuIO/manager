@@ -4,9 +4,9 @@ import "github.com/mainflux/manager"
 
 var _ manager.IdentityProvider = (*identityProviderMock)(nil)
 
-type identityProviderMock struct {
-}
+type identityProviderMock struct{}
 
+// NewIdentityProviderMock creates test-friendly identity provider.
 func NewIdentityProviderMock() manager.IdentityProvider {
 	return &identityProviderMock{}
 }
