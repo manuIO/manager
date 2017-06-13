@@ -8,6 +8,7 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
 	"github.com/mainflux/manager"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // MakeHandler returns a HTTP handler for API endpoints.
@@ -34,6 +35,7 @@ func MakeHandler(svc manager.Service) http.Handler {
 
 	r.Post("/users", registrationHandler)
 	r.Post("/tokens", loginHandler)
+	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
