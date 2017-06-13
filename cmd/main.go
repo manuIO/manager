@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -15,7 +16,14 @@ import (
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
+var opts struct {
+	Port int
+}
+
 func main() {
+	flag.IntVar(&opts.Port, "port", 8180, "HTTP server port")
+	flag.Parse()
+
 	users := mocks.NewUserRepositoryMock()
 	idp := mocks.NewIdentityProviderMock()
 
@@ -47,7 +55,8 @@ func main() {
 	errs := make(chan error, 2)
 
 	go func() {
-		errs <- http.ListenAndServe(":8180", api.MakeHandler(svc))
+		p := fmt.Sprintf(":%d", opts.Port)
+		errs <- http.ListenAndServe(p, api.MakeHandler(svc))
 	}()
 
 	go func() {
