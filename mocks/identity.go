@@ -6,8 +6,8 @@ var _ manager.IdentityProvider = (*identityProviderMock)(nil)
 
 type identityProviderMock struct{}
 
-// NewIdentityProviderMock creates test-friendly identity provider.
-func NewIdentityProviderMock() manager.IdentityProvider {
+// NewIdentityProvider creates test-friendly identity provider.
+func NewIdentityProvider() manager.IdentityProvider {
 	return &identityProviderMock{}
 }
 

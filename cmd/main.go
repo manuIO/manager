@@ -12,26 +12,41 @@ import (
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/mainflux/manager"
 	"github.com/mainflux/manager/api"
+	"github.com/mainflux/manager/cockroachdb"
 	"github.com/mainflux/manager/mocks"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
-var opts struct {
+const (
+	port int    = 8180
+	addr string = "postgresql://mainflux@0.0.0.0:26257/manager?sslmode=disable"
+)
+
+type flags struct {
 	Port int
+	Addr string
 }
 
 func main() {
-	flag.IntVar(&opts.Port, "port", 8180, "HTTP server port")
+	var cfg flags
+	flag.IntVar(&cfg.Port, "port", port, "HTTP server port")
+	flag.StringVar(&cfg.Addr, "db", addr, "database connection string")
 	flag.Parse()
-
-	users := mocks.NewUserRepositoryMock()
-	idp := mocks.NewIdentityProviderMock()
 
 	var logger log.Logger
 	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
 	var fields = []string{"method"}
+
+	db, err := cockroachdb.Connect(cfg.Addr)
+	if err != nil {
+		os.Exit(1)
+	}
+	defer db.Close()
+
+	users := cockroachdb.NewUserRepository(db)
+	idp := mocks.NewIdentityProvider()
 
 	var svc manager.Service
 	svc = manager.NewService(users, idp)
@@ -55,7 +70,7 @@ func main() {
 	errs := make(chan error, 2)
 
 	go func() {
-		p := fmt.Sprintf(":%d", opts.Port)
+		p := fmt.Sprintf(":%d", cfg.Port)
 		errs <- http.ListenAndServe(p, api.MakeHandler(svc))
 	}()
 

@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	ur  manager.UserRepository   = mocks.NewUserRepositoryMock()
-	idp manager.IdentityProvider = mocks.NewIdentityProviderMock()
+	ur  manager.UserRepository   = mocks.NewUserRepository()
+	idp manager.IdentityProvider = mocks.NewIdentityProvider()
 	svc manager.Service          = manager.NewService(ur, idp)
 )
 

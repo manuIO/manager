@@ -7,6 +7,8 @@ import (
 	"github.com/mainflux/manager"
 )
 
+var _ manager.Service = (*metricService)(nil)
+
 type metricService struct {
 	counter metrics.Counter
 	latency metrics.Histogram

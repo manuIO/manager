@@ -7,6 +7,8 @@ import (
 	"github.com/mainflux/manager"
 )
 
+var _ manager.Service = (*loggingService)(nil)
+
 type loggingService struct {
 	logger log.Logger
 	manager.Service
