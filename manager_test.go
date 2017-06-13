@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	ur  manager.UserRepository   = mocks.NewUserRepository()
-	idp manager.IdentityProvider = mocks.NewIdentityProvider()
-	svc manager.Service          = manager.NewService(ur, idp)
+	users  manager.UserRepository   = mocks.NewUserRepository()
+	hasher manager.Hasher           = mocks.NewHasher()
+	idp    manager.IdentityProvider = mocks.NewIdentityProvider()
+	svc    manager.Service          = manager.NewService(users, hasher, idp)
 )
 
 func TestRegister(t *testing.T) {
@@ -40,6 +41,7 @@ func TestLogin(t *testing.T) {
 	}{
 		{manager.User{"foo@bar.com", "pass"}, "foo@bar.com", nil},
 		{manager.User{"new@bar.com", "pass"}, "", manager.ErrInvalidCredentials},
+		{manager.User{"foo@bar.com", ""}, "", manager.ErrInvalidCredentials},
 	}
 
 	for _, tt := range cases {

@@ -10,13 +10,13 @@ var _ manager.UserRepository = (*userRepositoryMock)(nil)
 
 type userRepositoryMock struct {
 	mu    sync.Mutex
-	users map[string]*manager.User
+	users map[string]manager.User
 }
 
-// NewUserRepository creates test-friendly repository implementation.
+// NewUserRepository creates in-memory repository for test-purposes.
 func NewUserRepository() manager.UserRepository {
 	return &userRepositoryMock{
-		users: make(map[string]*manager.User),
+		users: make(map[string]manager.User),
 	}
 }
 
@@ -28,17 +28,17 @@ func (ur *userRepositoryMock) Save(user manager.User) error {
 		return manager.ErrConflict
 	}
 
-	ur.users[user.Email] = &user
+	ur.users[user.Email] = user
 	return nil
 }
 
-func (ur *userRepositoryMock) Exists(user manager.User) bool {
+func (ur *userRepositoryMock) Get(email string) (manager.User, error) {
 	ur.mu.Lock()
 	defer ur.mu.Unlock()
 
-	if val, ok := ur.users[user.Email]; ok {
-		return val.Password == user.Password
+	if val, ok := ur.users[email]; ok {
+		return val, nil
 	}
 
-	return false
+	return manager.User{}, manager.ErrInvalidCredentials
 }

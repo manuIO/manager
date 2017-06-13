@@ -12,6 +12,7 @@ import (
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/mainflux/manager"
 	"github.com/mainflux/manager/api"
+	"github.com/mainflux/manager/bcrypt"
 	"github.com/mainflux/manager/cockroachdb"
 	"github.com/mainflux/manager/mocks"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -46,10 +47,11 @@ func main() {
 	defer db.Close()
 
 	users := cockroachdb.NewUserRepository(db)
+	hasher := bcrypt.NewBcryptHasher()
 	idp := mocks.NewIdentityProvider()
 
 	var svc manager.Service
-	svc = manager.NewService(users, idp)
+	svc = manager.NewService(users, hasher, idp)
 	svc = api.NewLoggingService(logger, svc)
 	svc = api.NewMetricService(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{

@@ -9,9 +9,9 @@ import (
 	"github.com/mainflux/manager"
 )
 
-const (
-	uniqueErr string = "unique_violation"
-)
+const uniqueErr string = "unique_violation"
+
+var _ manager.UserRepository = (*userRepository)(nil)
 
 type userRepository struct {
 	db *gorm.DB
@@ -34,12 +34,12 @@ func NewUserRepository(db *gorm.DB) manager.UserRepository {
 }
 
 func (ur *userRepository) Save(user manager.User) error {
-	r := &userRecord{
+	rec := &userRecord{
 		Email:    user.Email,
 		Password: user.Password,
 	}
 
-	err := ur.db.Create(r).Error
+	err := ur.db.Create(rec).Error
 	if pqErr, ok := err.(*pq.Error); ok && strings.Contains(pqErr.Code.Name(), uniqueErr) {
 		return manager.ErrConflict
 	}
@@ -47,12 +47,17 @@ func (ur *userRepository) Save(user manager.User) error {
 	return err
 }
 
-func (ur *userRepository) Exists(user manager.User) bool {
-	u := &userRecord{}
+func (ur *userRepository) Get(email string) (manager.User, error) {
+	rec := &userRecord{}
 
-	if ne := ur.db.Where("email = ?", user.Email).First(u).RecordNotFound(); ne {
-		return false
+	if ne := ur.db.Where("email = ?", email).First(rec).RecordNotFound(); ne {
+		return manager.User{}, manager.ErrInvalidCredentials
 	}
 
-	return u.Password == user.Password
+	user := manager.User{
+		Email:    rec.Email,
+		Password: rec.Password,
+	}
+
+	return user, nil
 }

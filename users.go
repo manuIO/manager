@@ -33,7 +33,6 @@ type UserRepository interface {
 	// operation failure.
 	Save(User) error
 
-	// Exists determines whether or not an account with given credentials
-	// exists in the system.
-	Exists(User) bool
+	// Get retrieves user by its unique identifier (i.e. email).
+	Get(string) (User, error)
 }

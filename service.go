@@ -6,11 +6,3 @@ type Service interface {
 	Register(User) error
 	Login(User) (string, error)
 }
-
-// NewService instantiates the domain service implementation.
-func NewService(users UserRepository, idp IdentityProvider) Service {
-	return &managerService{
-		users: users,
-		idp:   idp,
-	}
-}

@@ -6,7 +6,8 @@ var _ manager.IdentityProvider = (*identityProviderMock)(nil)
 
 type identityProviderMock struct{}
 
-// NewIdentityProvider creates test-friendly identity provider.
+// NewIdentityProvider creates "mirror" identity provider, i.e. generated
+// token will hold value provided by the caller.
 func NewIdentityProvider() manager.IdentityProvider {
 	return &identityProviderMock{}
 }
