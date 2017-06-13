@@ -1,6 +1,8 @@
 package: github.com/mainflux/manager
 license: Apache License 2.0
 import:
+  - package: github.com/dgrijalva/jwt-go
+    version: 3.0.0
   - package: github.com/go-kit/kit
     version: ~0.4.x
   - package: github.com/go-logfmt/logfmt

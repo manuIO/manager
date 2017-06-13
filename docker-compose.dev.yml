@@ -12,7 +12,6 @@ services:
         aliases:
           - roach_a
     ports:
-      - "5432:5432"
       - "8080:8080"
       - "26257:26257"
     command: start --insecure

@@ -14,24 +14,27 @@ import (
 	"github.com/mainflux/manager/api"
 	"github.com/mainflux/manager/bcrypt"
 	"github.com/mainflux/manager/cockroachdb"
-	"github.com/mainflux/manager/mocks"
+	"github.com/mainflux/manager/jwt"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 const (
-	port int    = 8180
-	addr string = "postgresql://mainflux@0.0.0.0:26257/manager?sslmode=disable"
+	port   int    = 8180
+	dbAddr string = "postgresql://mainflux@0.0.0.0:26257/manager?sslmode=disable"
+	secret string = "token-secret"
 )
 
 type flags struct {
-	Port int
-	Addr string
+	Port   int
+	DbAddr string
+	Secret string
 }
 
 func main() {
 	var cfg flags
 	flag.IntVar(&cfg.Port, "port", port, "HTTP server port")
-	flag.StringVar(&cfg.Addr, "db", addr, "database connection string")
+	flag.StringVar(&cfg.DbAddr, "db", dbAddr, "database connection string")
+	flag.StringVar(&cfg.Secret, "secret", secret, "access token signing secret")
 	flag.Parse()
 
 	var logger log.Logger
@@ -40,15 +43,15 @@ func main() {
 
 	var fields = []string{"method"}
 
-	db, err := cockroachdb.Connect(cfg.Addr)
+	db, err := cockroachdb.Connect(cfg.DbAddr)
 	if err != nil {
 		os.Exit(1)
 	}
 	defer db.Close()
 
 	users := cockroachdb.NewUserRepository(db)
-	hasher := bcrypt.NewBcryptHasher()
-	idp := mocks.NewIdentityProvider()
+	hasher := bcrypt.NewHasher()
+	idp := jwt.NewIdentityProvider(cfg.Secret)
 
 	var svc manager.Service
 	svc = manager.NewService(users, hasher, idp)

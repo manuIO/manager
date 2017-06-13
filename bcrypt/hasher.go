@@ -11,8 +11,8 @@ var _ manager.Hasher = (*bcryptHasher)(nil)
 
 type bcryptHasher struct{}
 
-// NewBcryptHasher instantiates a bcrypt-based hasher implementation.
-func NewBcryptHasher() manager.Hasher {
+// NewHasher instantiates a bcrypt-based hasher implementation.
+func NewHasher() manager.Hasher {
 	return &bcryptHasher{}
 }
 

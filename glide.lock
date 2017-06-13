@@ -1,10 +1,12 @@
-hash: 416a5838613c04d18625735b934536c4a3339d2b6e382c10e4a78ae0036e92ca
-updated: 2017-06-13T23:23:35.956545219+02:00
+hash: 749a9e0632bdb5f6fd18852e5870d406caf2870d51f5383e82a68755738c159f
+updated: 2017-06-14T00:20:11.597110297+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
+- name: github.com/dgrijalva/jwt-go
+  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/go-kit/kit
   version: fadad6fffe0466b19df9efd9acde5c9a52df5fa4
   subpackages:
@@ -64,6 +66,7 @@ imports:
   version: 14f9af67c679edd414f72f13d67c917447113df2
   subpackages:
   - bcrypt
+  - blowfish
 - name: golang.org/x/net
   version: dfe83d419c9403b40b19d08cdba2afec27b002f7
   subpackages:
