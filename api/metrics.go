@@ -15,7 +15,7 @@ type metricService struct {
 	manager.Service
 }
 
-// NetMetricService instruments core service by tracking request count and
+// NewMetricService instruments core service by tracking request count and
 // latency.
 func NewMetricService(counter metrics.Counter, latency metrics.Histogram, s manager.Service) manager.Service {
 	return &metricService{
