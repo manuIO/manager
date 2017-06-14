@@ -11,6 +11,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+type apiResponse interface {
+	code() int
+	empty() bool
+}
+
 // MakeHandler returns a HTTP handler for API endpoints.
 func MakeHandler(svc manager.Service) http.Handler {
 	opts := []kithttp.ServerOption{
@@ -51,10 +56,21 @@ func decodeCredentialsRequest(_ context.Context, r *http.Request) (interface{}, 
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	if ar, ok := response.(apiResponse); ok {
+		w.WriteHeader(ar.code())
+
+		if ar.empty() {
+			return nil
+		}
+	}
+
 	return json.NewEncoder(w).Encode(response)
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
 	switch err {
 	case manager.ErrInvalidCredentials:
 		w.WriteHeader(http.StatusBadRequest)

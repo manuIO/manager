@@ -1,5 +1,5 @@
 hash: 749a9e0632bdb5f6fd18852e5870d406caf2870d51f5383e82a68755738c159f
-updated: 2017-06-14T00:20:11.597110297+02:00
+updated: 2017-06-14T16:05:44.47573317+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -23,21 +23,18 @@ imports:
 - name: github.com/go-zoo/bone
   version: fd0aebc74e908868b09ac140fb5a53cb363884c1
 - name: github.com/golang/protobuf
-  version: 4f95b0d3eab845462f9b0ca5ad21dea8093be211
+  version: e325f446bebc2998605911c0a2650d9920361d4a
   subpackages:
   - proto
 - name: github.com/jinzhu/gorm
   version: 5174cc5c242a728b435ea2be8a2f7f998e15429b
-  subpackages:
-  - dialects/postgres
 - name: github.com/jinzhu/inflection
   version: 1c35d901db3da928c72a72d8458480cc9ade058f
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 - name: github.com/lib/pq
-  version: ae8357db35d721c58dcdc911318b55bef6b1b001
+  version: 8837942c3e09574accbc5f150e2c5e057189cace
   subpackages:
-  - hstore
   - oid
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
@@ -63,7 +60,7 @@ imports:
   subpackages:
   - xfs
 - name: golang.org/x/crypto
-  version: 14f9af67c679edd414f72f13d67c917447113df2
+  version: 850760c427c516be930bc91280636328f1a62286
   subpackages:
   - bcrypt
   - blowfish
