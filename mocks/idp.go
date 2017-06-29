@@ -16,6 +16,6 @@ func (idp *identityProviderMock) Key(id string) (string, error) {
 	return id, nil
 }
 
-func (idp *identityProviderMock) IsValid(key string) bool {
-	return len(key) > 0
+func (idp *identityProviderMock) Identity(key string) (string, error) {
+	return key, nil
 }

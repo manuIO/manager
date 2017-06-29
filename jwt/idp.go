@@ -29,6 +29,7 @@ func (idp *jwtIdentityProvider) Key(id string) (string, error) {
 	exp := now.Add(duration)
 
 	claims := jwt.StandardClaims{
+		Subject:   id,
 		Issuer:    issuer,
 		IssuedAt:  now.Unix(),
 		ExpiresAt: exp.Unix(),
@@ -38,7 +39,7 @@ func (idp *jwtIdentityProvider) Key(id string) (string, error) {
 	return token.SignedString([]byte(idp.secret))
 }
 
-func (idp *jwtIdentityProvider) IsValid(key string) bool {
+func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
 	token, _ := jwt.Parse(key, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -47,5 +48,9 @@ func (idp *jwtIdentityProvider) IsValid(key string) bool {
 		return []byte(idp.secret), nil
 	})
 
-	return token.Valid
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims["sub"].(string), nil
+	}
+
+	return "", manager.ErrInvalidCredentials
 }

@@ -6,6 +6,6 @@ type IdentityProvider interface {
 	// Key generates the platform access token.
 	Key(string) (string, error)
 
-	// IsValid determines whether or not provided token is valid.
-	IsValid(string) bool
+	// Identity extracts the entity identifier given its secret key.
+	Identity(string) (string, error)
 }
