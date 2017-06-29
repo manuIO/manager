@@ -17,8 +17,6 @@ func NewService(users UserRepository, hasher Hasher, idp IdentityProvider) Servi
 	}
 }
 
-// Register created new user account. In case the registration fails, a non-nil
-// error value is returned.
 func (ms *managerService) Register(user User) error {
 	if err := user.validate(); err != nil {
 		return err
@@ -33,9 +31,6 @@ func (ms *managerService) Register(user User) error {
 	return ms.users.Save(user)
 }
 
-// Login performs user authentication given its credentials. Successful
-// authentication generates new access token. Failed invocations are identified
-// by the non-nil error values present in the response.
 func (ms *managerService) Login(user User) (string, error) {
 	dbUser, err := ms.users.Get(user.Email)
 	if err != nil {
