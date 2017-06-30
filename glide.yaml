@@ -5,15 +5,10 @@ import:
     version: 3.0.0
   - package: github.com/go-kit/kit
     version: ~0.4.x
-  - package: github.com/go-logfmt/logfmt
-    version: 0.3.0
-  - package: github.com/go-stack/stack
-    version: 1.5.3
   - package: github.com/go-zoo/bone
     version: 1.2
   - package: github.com/jinzhu/gorm
     version: 1.0
-  - package: github.com/jinzhu/inflection
   - package: github.com/prometheus/client_golang
     version: ~0.8.x
   - package: golang.org/x/crypto
