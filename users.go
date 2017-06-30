@@ -26,8 +26,7 @@ func (u *User) validate() error {
 	return nil
 }
 
-// UserRepository specifies an API that needs to be implemented by the concrete
-// storage providers (e.g. CockroachDB repository).
+// UserRepository specifies an account persistence API.
 type UserRepository interface {
 	// Save persists the user account. A non-nil error is returned to indicate
 	// operation failure.

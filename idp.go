@@ -1,7 +1,7 @@
 package manager
 
-// IdentityProvider specifies an API each concrete identity provider must
-// fulfill (e.g. x509 certificates, JWT).
+// IdentityProvider specifies an API for identity management via security
+// tokens.
 type IdentityProvider interface {
 	// Key generates the platform access token.
 	Key(string) (string, error)

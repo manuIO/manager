@@ -19,9 +19,9 @@ func NewLoggingService(logger log.Logger, s manager.Service) manager.Service {
 	return &loggingService{logger, s}
 }
 
-func (s *loggingService) Register(user manager.User) (err error) {
+func (ls *loggingService) Register(user manager.User) (err error) {
 	defer func(begin time.Time) {
-		s.logger.Log(
+		ls.logger.Log(
 			"method", "register",
 			"email", user.Email,
 			"took", time.Since(begin),
@@ -29,12 +29,12 @@ func (s *loggingService) Register(user manager.User) (err error) {
 		)
 	}(time.Now())
 
-	return s.Service.Register(user)
+	return ls.Service.Register(user)
 }
 
-func (s *loggingService) Login(user manager.User) (token string, err error) {
+func (ls *loggingService) Login(user manager.User) (token string, err error) {
 	defer func(begin time.Time) {
-		s.logger.Log(
+		ls.logger.Log(
 			"method", "login",
 			"email", user.Email,
 			"took", time.Since(begin),
@@ -42,5 +42,19 @@ func (s *loggingService) Login(user manager.User) (token string, err error) {
 		)
 	}(time.Now())
 
-	return s.Service.Login(user)
+	return ls.Service.Login(user)
+}
+
+func (ls *loggingService) CreateDevice(key string, device manager.Device) (id uint, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "create_device",
+			"owner", device.Owner,
+			"id", id,
+			"took", time.Since(begin),
+			"error", err,
+		)
+	}(time.Now())
+
+	return ls.Service.CreateDevice(key, device)
 }

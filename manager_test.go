@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	users  manager.UserRepository   = mocks.NewUserRepository()
-	hasher manager.Hasher           = mocks.NewHasher()
-	idp    manager.IdentityProvider = mocks.NewIdentityProvider()
-	svc    manager.Service          = manager.NewService(users, hasher, idp)
+	users   manager.UserRepository   = mocks.NewUserRepository()
+	devices manager.DeviceRepository = mocks.NewDeviceRepository()
+	hasher  manager.Hasher           = mocks.NewHasher()
+	idp     manager.IdentityProvider = mocks.NewIdentityProvider()
+	svc     manager.Service          = manager.NewService(users, devices, hasher, idp)
 )
 
 func TestRegister(t *testing.T) {

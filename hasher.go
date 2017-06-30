@@ -1,6 +1,7 @@
 package manager
 
-// Hasher specifies an API for all hashing algorithm wrappers (e.g. bcrypt).
+// Hasher specifies an API for generating hashes of an arbitrary textual
+// content.
 type Hasher interface {
 	// Hash generates the hashed string from plain-text.
 	Hash(string) (string, error)

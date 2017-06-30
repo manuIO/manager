@@ -25,20 +25,29 @@ func NewMetricService(counter metrics.Counter, latency metrics.Histogram, s mana
 	}
 }
 
-func (s *metricService) Register(user manager.User) (err error) {
+func (ms *metricService) Register(user manager.User) error {
 	defer func(begin time.Time) {
-		s.counter.With("method", "register").Add(1)
-		s.latency.With("method", "register").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "register").Add(1)
+		ms.latency.With("method", "register").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return s.Service.Register(user)
+	return ms.Service.Register(user)
 }
 
-func (s *metricService) Login(user manager.User) (token string, err error) {
+func (ms *metricService) Login(user manager.User) (string, error) {
 	defer func(begin time.Time) {
-		s.counter.With("method", "login").Add(1)
-		s.latency.With("method", "login").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "login").Add(1)
+		ms.latency.With("method", "login").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return s.Service.Login(user)
+	return ms.Service.Login(user)
+}
+
+func (ms *metricService) CreateDevice(key string, device manager.Device) (uint, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "create_device").Add(1)
+		ms.latency.With("method", "create_device").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.CreateDevice(key, device)
 }

@@ -3,17 +3,19 @@ package manager
 var _ Service = (*managerService)(nil)
 
 type managerService struct {
-	users  UserRepository
-	hasher Hasher
-	idp    IdentityProvider
+	users   UserRepository
+	devices DeviceRepository
+	hasher  Hasher
+	idp     IdentityProvider
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(users UserRepository, hasher Hasher, idp IdentityProvider) Service {
+func NewService(ur UserRepository, dr DeviceRepository, hasher Hasher, idp IdentityProvider) Service {
 	return &managerService{
-		users:  users,
-		hasher: hasher,
-		idp:    idp,
+		users:   ur,
+		devices: dr,
+		hasher:  hasher,
+		idp:     idp,
 	}
 }
 
@@ -42,4 +44,8 @@ func (ms *managerService) Login(user User) (string, error) {
 	}
 
 	return ms.idp.Key(user.Email)
+}
+
+func (ms *managerService) CreateDevice(key string, device Device) (uint, error) {
+	return 0, nil
 }

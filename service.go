@@ -11,4 +11,7 @@ type Service interface {
 	// authentication generates new access token. Failed invocations are
 	// identified by the non-nil error values present in the response.
 	Login(User) (string, error)
+
+	// CreateDevice adds new device to the user identified by the provided key.
+	CreateDevice(string, Device) (uint, error)
 }
