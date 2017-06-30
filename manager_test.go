@@ -51,3 +51,25 @@ func TestLogin(t *testing.T) {
 		assert.Equal(t, tt.err, e, "unexpected error occurred")
 	}
 }
+
+func TestCreateDevice(t *testing.T) {
+	var cases = []struct {
+		key    string
+		device manager.Device
+		id     uint
+		err    error
+	}{
+		{"foo@bar.com", manager.Device{Name: "a"}, 1, nil},
+		{"foo@bar.com", manager.Device{Name: "b"}, 2, nil},
+		{"foo@bar.com", manager.Device{Name: "c"}, 3, nil},
+		{"foo@bar.com", manager.Device{ID: 3, Name: "c"}, 3, nil},
+		{"", manager.Device{Name: "d"}, 0, manager.ErrInvalidCredentials},
+		{"foo@bar.com", manager.Device{}, 0, manager.ErrMalformedDevice},
+	}
+
+	for _, tt := range cases {
+		id, err := svc.CreateDevice(tt.key, tt.device)
+		assert.Equal(t, tt.id, id, "unexpected id retrieved")
+		assert.Equal(t, tt.err, err, "unexpected error occurred")
+	}
+}

@@ -10,6 +10,14 @@ type Device struct {
 	Channels    []uint
 }
 
+func (d *Device) validate() error {
+	if d.Name == "" || len(d.Name) > 50 {
+		return ErrMalformedDevice
+	}
+
+	return nil
+}
+
 // DeviceRepository specifies a device persistence API.
 type DeviceRepository interface {
 	// Save persists the device. Successful operation is indicated by unique

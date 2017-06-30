@@ -47,5 +47,16 @@ func (ms *managerService) Login(user User) (string, error) {
 }
 
 func (ms *managerService) CreateDevice(key string, device Device) (uint, error) {
-	return 0, nil
+	if err := device.validate(); err != nil {
+		return 0, err
+	}
+
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return 0, err
+	}
+
+	device.Owner = sub
+
+	return ms.devices.Save(device)
 }

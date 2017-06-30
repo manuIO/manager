@@ -11,11 +11,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type apiResponse interface {
-	code() int
-	empty() bool
-}
-
 // MakeHandler returns a HTTP handler for API endpoints.
 func MakeHandler(svc manager.Service) http.Handler {
 	opts := []kithttp.ServerOption{
@@ -36,10 +31,18 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	)
 
+	deviceCreationHandler := kithttp.NewServer(
+		makeCreateDeviceEndpoint(svc),
+		decodeCreateDeviceRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	r := bone.New()
 
 	r.Post("/users", registrationHandler)
 	r.Post("/tokens", loginHandler)
+	r.Post("/devices", deviceCreationHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
@@ -54,11 +57,29 @@ func decodeCredentialsRequest(_ context.Context, r *http.Request) (interface{}, 
 	return user, nil
 }
 
+func decodeCreateDeviceRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var device manager.Device
+	if err := json.NewDecoder(r.Body).Decode(&device); err != nil {
+		return nil, err
+	}
+
+	cdr := createDeviceRequest{
+		key:    r.Header.Get("Authorization"),
+		device: device,
+	}
+
+	return cdr, nil
+}
+
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	if ar, ok := response.(apiResponse); ok {
 		w.WriteHeader(ar.code())
+
+		for k, v := range ar.headers() {
+			w.Header().Set(k, v)
+		}
 
 		if ar.empty() {
 			return nil
@@ -72,8 +93,10 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	switch err {
-	case manager.ErrInvalidCredentials:
+	case manager.ErrInvalidCredentials, manager.ErrMalformedDevice:
 		w.WriteHeader(http.StatusBadRequest)
+	case manager.ErrUnauthorizedAccess:
+		w.WriteHeader(http.StatusForbidden)
 	case manager.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
 	default:

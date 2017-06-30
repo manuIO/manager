@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"fmt"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -40,17 +39,21 @@ func (idp *jwtIdentityProvider) Key(id string) (string, error) {
 }
 
 func (idp *jwtIdentityProvider) Identity(key string) (string, error) {
-	token, _ := jwt.Parse(key, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(key, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, manager.ErrUnauthorizedAccess
 		}
 
 		return []byte(idp.secret), nil
 	})
 
+	if err != nil {
+		return "", manager.ErrUnauthorizedAccess
+	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return claims["sub"].(string), nil
 	}
 
-	return "", manager.ErrInvalidCredentials
+	return "", manager.ErrUnauthorizedAccess
 }

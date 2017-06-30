@@ -13,7 +13,7 @@ type userRepositoryMock struct {
 	users map[string]manager.User
 }
 
-// NewUserRepository creates in-memory repository for test-purposes.
+// NewUserRepository creates in-memory user repository.
 func NewUserRepository() manager.UserRepository {
 	return &userRepositoryMock{
 		users: make(map[string]manager.User),

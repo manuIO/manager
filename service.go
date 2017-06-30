@@ -1,5 +1,23 @@
 package manager
 
+import "errors"
+
+var (
+	// ErrConflict indicates usage of the existing email during account
+	// registration.
+	ErrConflict error = errors.New("email already taken")
+
+	// ErrInvalidCredentials indicates malformed account credentials.
+	ErrInvalidCredentials error = errors.New("invalid email or password")
+
+	// ErrMalformedDevice indicates malformed device specification (e.g. empty name).
+	ErrMalformedDevice error = errors.New("malformed device specification")
+
+	// ErrUnauthorizedAccess indicates missing or invalid credentials provided
+	// when accessing a protected resource.
+	ErrUnauthorizedAccess error = errors.New("missing or invalid credentials provided")
+)
+
 // Service specifies an API that must be fullfiled by the domain service
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {

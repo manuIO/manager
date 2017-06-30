@@ -13,9 +13,13 @@ func NewIdentityProvider() manager.IdentityProvider {
 }
 
 func (idp *identityProviderMock) Key(id string) (string, error) {
+	if id == "" {
+		return "", manager.ErrInvalidCredentials
+	}
+
 	return id, nil
 }
 
 func (idp *identityProviderMock) Identity(key string) (string, error) {
-	return key, nil
+	return idp.Key(key)
 }

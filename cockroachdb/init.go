@@ -12,6 +12,7 @@ func Connect(addr string) (*gorm.DB, error) {
 	}
 
 	db.AutoMigrate(&userRecord{})
+	db.AutoMigrate(&deviceRecord{})
 	db.LogMode(false)
 
 	return db, nil

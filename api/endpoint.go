@@ -2,23 +2,10 @@ package api
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/mainflux/manager"
 )
-
-type tokenResponse struct {
-	Token string `json:"token,omitempty"`
-}
-
-func (tr tokenResponse) code() int {
-	return http.StatusCreated
-}
-
-func (tr tokenResponse) empty() bool {
-	return tr.Token == ""
-}
 
 func makeRegistrationEndpoint(s manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
@@ -38,5 +25,18 @@ func makeLoginEndpoint(s manager.Service) endpoint.Endpoint {
 		}
 
 		return tokenResponse{token}, nil
+	}
+}
+
+func makeCreateDeviceEndpoint(s manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		cdr := request.(createDeviceRequest)
+
+		id, err := s.CreateDevice(cdr.key, cdr.device)
+		if err != nil {
+			return "", err
+		}
+
+		return createDeviceResponse{id}, nil
 	}
 }
