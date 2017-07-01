@@ -6,6 +6,7 @@ type Device struct {
 	ID          uint   `json:"id"`
 	Owner       string `json:"-"`
 	Name        string `json:"name"`
+	Key         string `json:"key"`
 	Description string `json:"description"`
 	Channels    []uint `json:"channels"`
 }

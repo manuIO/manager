@@ -43,7 +43,7 @@ func (ms *managerService) Login(user User) (string, error) {
 		return "", ErrInvalidCredentials
 	}
 
-	return ms.idp.Key(user.Email)
+	return ms.idp.TemporaryKey(user.Email)
 }
 
 func (ms *managerService) CreateDevice(key string, device Device) (uint, error) {
@@ -57,6 +57,7 @@ func (ms *managerService) CreateDevice(key string, device Device) (uint, error) 
 	}
 
 	device.Owner = sub
+	device.Key, _ = ms.idp.PermanentKey(sub)
 
 	return ms.devices.Save(device)
 }

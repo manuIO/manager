@@ -23,7 +23,7 @@ func NewIdentityProvider(secret string) manager.IdentityProvider {
 	return &jwtIdentityProvider{}
 }
 
-func (idp *jwtIdentityProvider) Key(id string) (string, error) {
+func (idp *jwtIdentityProvider) TemporaryKey(id string) (string, error) {
 	now := time.Now().UTC()
 	exp := now.Add(duration)
 
@@ -34,6 +34,20 @@ func (idp *jwtIdentityProvider) Key(id string) (string, error) {
 		ExpiresAt: exp.Unix(),
 	}
 
+	return idp.jwt(claims)
+}
+
+func (idp *jwtIdentityProvider) PermanentKey(id string) (string, error) {
+	claims := jwt.StandardClaims{
+		Subject:  id,
+		Issuer:   issuer,
+		IssuedAt: time.Now().UTC().Unix(),
+	}
+
+	return idp.jwt(claims)
+}
+
+func (idp *jwtIdentityProvider) jwt(claims jwt.StandardClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(idp.secret))
 }

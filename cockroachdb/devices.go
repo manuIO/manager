@@ -19,6 +19,7 @@ type deviceRecord struct {
 	gorm.Model
 	OwnerID     string `sql:"type:varchar(254) REFERENCES users(email)"`
 	Name        string `gorm:"type:varchar(50);not null"`
+	Key         string `gorm:"type:text;not null"`
 	Description string
 	Channels    string
 }
@@ -37,6 +38,7 @@ func (dr *deviceRepository) Save(device manager.Device) (uint, error) {
 	rec := &deviceRecord{
 		OwnerID:     device.Owner,
 		Name:        device.Name,
+		Key:         device.Key,
 		Description: device.Description,
 		Channels:    toString(device.Channels),
 	}
@@ -61,6 +63,7 @@ func (dr *deviceRepository) One(id uint, owner string) (manager.Device, error) {
 		ID:          rec.ID,
 		Owner:       rec.OwnerID,
 		Name:        rec.Name,
+		Key:         rec.Key,
 		Description: rec.Description,
 		Channels:    fromString(rec.Channels),
 	}
