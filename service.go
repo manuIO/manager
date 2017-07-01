@@ -16,6 +16,9 @@ var (
 	// ErrUnauthorizedAccess indicates missing or invalid credentials provided
 	// when accessing a protected resource.
 	ErrUnauthorizedAccess error = errors.New("missing or invalid credentials provided")
+
+	// ErrNotFound indicates a non-existent entity request.
+	ErrNotFound error = errors.New("non-existent entity")
 )
 
 // Service specifies an API that must be fullfiled by the domain service
@@ -32,4 +35,8 @@ type Service interface {
 
 	// CreateDevice adds new device to the user identified by the provided key.
 	CreateDevice(string, Device) (uint, error)
+
+	// DeviceInfo retrieves data about the device belonging to the user
+	// identified by the provided key and identified by the provided device ID.
+	DeviceInfo(string, uint) (Device, error)
 }

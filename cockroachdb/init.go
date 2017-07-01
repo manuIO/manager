@@ -2,6 +2,7 @@ package cockroachdb
 
 import (
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // Connect establishes connection to the CockroachDB cluster.

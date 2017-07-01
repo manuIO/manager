@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
@@ -38,11 +39,19 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	)
 
+	deviceInfoHandler := kithttp.NewServer(
+		makeDeviceInfoEndpoint(svc),
+		decodeDeviceInfoRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	r := bone.New()
 
 	r.Post("/users", registrationHandler)
 	r.Post("/tokens", loginHandler)
 	r.Post("/devices", deviceCreationHandler)
+	r.Get("/devices/:id", deviceInfoHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
@@ -71,15 +80,26 @@ func decodeCreateDeviceRequest(_ context.Context, r *http.Request) (interface{},
 	return cdr, nil
 }
 
+func decodeDeviceInfoRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	id, _ := strconv.ParseUint(bone.GetValue(r, "id"), 0, 0)
+
+	dir := deviceInfoRequest{
+		key: r.Header.Get("Authorization"),
+		id:  uint(id),
+	}
+
+	return dir, nil
+}
+
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", contentType)
 
 	if ar, ok := response.(apiResponse); ok {
-		w.WriteHeader(ar.code())
-
 		for k, v := range ar.headers() {
 			w.Header().Set(k, v)
 		}
+
+		w.WriteHeader(ar.code())
 
 		if ar.empty() {
 			return nil
@@ -90,13 +110,15 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", contentType)
 
 	switch err {
 	case manager.ErrInvalidCredentials, manager.ErrMalformedDevice:
 		w.WriteHeader(http.StatusBadRequest)
 	case manager.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)
+	case manager.ErrNotFound:
+		w.WriteHeader(http.StatusNotFound)
 	case manager.ErrConflict:
 		w.WriteHeader(http.StatusConflict)
 	default:

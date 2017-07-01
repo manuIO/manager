@@ -28,9 +28,9 @@ func TestRegister(t *testing.T) {
 		{manager.User{"abc@bar.com", "pass"}, nil},
 	}
 
-	for _, tt := range cases {
-		e := svc.Register(tt.user)
-		assert.Equal(t, tt.err, e, "unexpected error occurred")
+	for _, tc := range cases {
+		e := svc.Register(tc.user)
+		assert.Equal(t, tc.err, e, "unexpected error occurred")
 	}
 }
 
@@ -45,10 +45,10 @@ func TestLogin(t *testing.T) {
 		{manager.User{"foo@bar.com", ""}, "", manager.ErrInvalidCredentials},
 	}
 
-	for _, tt := range cases {
-		k, e := svc.Login(tt.user)
-		assert.Equal(t, tt.key, k, "unexpected key retrieved")
-		assert.Equal(t, tt.err, e, "unexpected error occurred")
+	for _, tc := range cases {
+		k, e := svc.Login(tc.user)
+		assert.Equal(t, tc.key, k, "unexpected key retrieved")
+		assert.Equal(t, tc.err, e, "unexpected error occurred")
 	}
 }
 
@@ -63,13 +63,30 @@ func TestCreateDevice(t *testing.T) {
 		{"foo@bar.com", manager.Device{Name: "b"}, 2, nil},
 		{"foo@bar.com", manager.Device{Name: "c"}, 3, nil},
 		{"foo@bar.com", manager.Device{ID: 3, Name: "c"}, 3, nil},
-		{"", manager.Device{Name: "d"}, 0, manager.ErrInvalidCredentials},
+		{"", manager.Device{Name: "d"}, 0, manager.ErrUnauthorizedAccess},
 		{"foo@bar.com", manager.Device{}, 0, manager.ErrMalformedDevice},
 	}
 
-	for _, tt := range cases {
-		id, err := svc.CreateDevice(tt.key, tt.device)
-		assert.Equal(t, tt.id, id, "unexpected id retrieved")
-		assert.Equal(t, tt.err, err, "unexpected error occurred")
+	for _, tc := range cases {
+		id, err := svc.CreateDevice(tc.key, tc.device)
+		assert.Equal(t, tc.id, id, "unexpected id retrieved")
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}
+
+func TestDeviceInfo(t *testing.T) {
+	var cases = []struct {
+		id  uint
+		key string
+		err error
+	}{
+		{1, "foo@bar.com", nil},
+		{1, "", manager.ErrUnauthorizedAccess},
+		{5, "foo@bar.com", manager.ErrNotFound},
+	}
+
+	for _, tc := range cases {
+		_, err := svc.DeviceInfo(tc.key, tc.id)
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }

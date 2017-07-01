@@ -3,11 +3,11 @@ package manager
 // Device represents a Mainflux device. Each device is owned by one user, and
 // it is assigned with the unique identifier.
 type Device struct {
-	ID          uint
-	Owner       string
-	Name        string
-	Description string
-	Channels    []uint
+	ID          uint   `json:"id"`
+	Owner       string `json:"owner"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Channels    []uint `json:"channels"`
 }
 
 func (d *Device) validate() error {
@@ -24,4 +24,8 @@ type DeviceRepository interface {
 	// identifier accompanied by nil error response. A non-nil error is
 	// returned to indicate operation failure.
 	Save(Device) (uint, error)
+
+	// One retrieves the device identified by the provided unique ID and owned
+	// by the specified user.
+	One(uint, string) (Device, error)
 }

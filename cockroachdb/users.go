@@ -2,8 +2,10 @@ package cockroachdb
 
 import (
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/lib/pq"
 	"github.com/mainflux/manager"
 )
@@ -17,9 +19,9 @@ type userRepository struct {
 }
 
 type userRecord struct {
-	gorm.Model
-	Email    string `gorm:"type:varchar(254);not null;unique"`
-	Password string `gorm:"type:char(60);not null"`
+	Email     string `gorm:"type:varchar(254);primary_key"`
+	Password  string `gorm:"type:char(60);not null"`
+	CreatedAt time.Time
 }
 
 // TableName sets user entity table name.

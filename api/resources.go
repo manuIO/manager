@@ -7,6 +7,8 @@ import (
 	"github.com/mainflux/manager"
 )
 
+const contentType = "application/json; charset=utf-8"
+
 type apiResponse interface {
 	code() int
 	headers() map[string]string
@@ -22,7 +24,7 @@ func (tr tokenResponse) code() int {
 }
 
 func (tr tokenResponse) headers() map[string]string {
-	return make(map[string]string)
+	return map[string]string{}
 }
 
 func (tr tokenResponse) empty() bool {
@@ -50,4 +52,25 @@ func (cdr createDeviceResponse) headers() map[string]string {
 
 func (cdr createDeviceResponse) empty() bool {
 	return true
+}
+
+type deviceInfoRequest struct {
+	id  uint
+	key string
+}
+
+type deviceInfoResponse struct {
+	manager.Device
+}
+
+func (dir deviceInfoResponse) code() int {
+	return http.StatusOK
+}
+
+func (dir deviceInfoResponse) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (dir deviceInfoResponse) empty() bool {
+	return false
 }

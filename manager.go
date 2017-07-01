@@ -60,3 +60,12 @@ func (ms *managerService) CreateDevice(key string, device Device) (uint, error) 
 
 	return ms.devices.Save(device)
 }
+
+func (ms *managerService) DeviceInfo(key string, id uint) (Device, error) {
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return Device{}, err
+	}
+
+	return ms.devices.One(id, sub)
+}

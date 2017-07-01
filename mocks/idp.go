@@ -14,7 +14,7 @@ func NewIdentityProvider() manager.IdentityProvider {
 
 func (idp *identityProviderMock) Key(id string) (string, error) {
 	if id == "" {
-		return "", manager.ErrInvalidCredentials
+		return "", manager.ErrUnauthorizedAccess
 	}
 
 	return id, nil

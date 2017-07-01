@@ -1,14 +1,10 @@
 package cockroachdb
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/mainflux/manager"
 )
-
-const sep string = ","
 
 var _ manager.DeviceRepository = (*deviceRepository)(nil)
 
@@ -24,6 +20,7 @@ type deviceRecord struct {
 	Channels    string
 }
 
+// TableName sets device entity table name.
 func (dr deviceRecord) TableName() string {
 	return "devices"
 }
@@ -45,11 +42,20 @@ func (dr *deviceRepository) Save(device manager.Device) (uint, error) {
 	return rec.ID, err
 }
 
-func toString(slice []uint) string {
-	text := []string{}
-	for _, v := range slice {
-		text = append(text, fmt.Sprintf("%d", v))
+func (dr *deviceRepository) One(id uint, owner string) (manager.Device, error) {
+	rec := &deviceRecord{}
+
+	if dr.db.Where("id = ? AND owner = ?", id, owner).First(rec).RecordNotFound() {
+		return manager.Device{}, manager.ErrNotFound
 	}
 
-	return strings.Join(text, sep)
+	device := manager.Device{
+		ID:          rec.ID,
+		Owner:       rec.Owner,
+		Name:        rec.Name,
+		Description: rec.Description,
+		Channels:    fromString(rec.Channels),
+	}
+
+	return device, nil
 }

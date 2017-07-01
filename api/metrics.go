@@ -51,3 +51,12 @@ func (ms *metricService) CreateDevice(key string, device manager.Device) (uint, 
 
 	return ms.Service.CreateDevice(key, device)
 }
+
+func (ms *metricService) DeviceInfo(key string, id uint) (manager.Device, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "device_info").Add(1)
+		ms.latency.With("method", "device_info").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.DeviceInfo(key, id)
+}

@@ -58,3 +58,17 @@ func (ls *loggingService) CreateDevice(key string, device manager.Device) (id ui
 
 	return ls.Service.CreateDevice(key, device)
 }
+
+func (ls *loggingService) DeviceInfo(key string, id uint) (device manager.Device, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "device_info",
+			"owner", device.Owner,
+			"id", id,
+			"took", time.Since(begin),
+			"error", err,
+		)
+	}(time.Now())
+
+	return ls.Service.DeviceInfo(key, id)
+}

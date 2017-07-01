@@ -21,7 +21,7 @@ func makeLoginEndpoint(s manager.Service) endpoint.Endpoint {
 
 		token, err := s.Login(user)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
 		return tokenResponse{token}, nil
@@ -34,9 +34,22 @@ func makeCreateDeviceEndpoint(s manager.Service) endpoint.Endpoint {
 
 		id, err := s.CreateDevice(cdr.key, cdr.device)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
 		return createDeviceResponse{id}, nil
+	}
+}
+
+func makeDeviceInfoEndpoint(s manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		dir := request.(deviceInfoRequest)
+
+		device, err := s.DeviceInfo(dir.key, dir.id)
+		if err != nil {
+			return nil, err
+		}
+
+		return deviceInfoResponse{device}, nil
 	}
 }
