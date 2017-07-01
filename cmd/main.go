@@ -20,7 +20,7 @@ import (
 
 const (
 	port   int    = 8180
-	dbAddr string = "postgresql://mainflux@0.0.0.0:26257/manager?sslmode=disable"
+	dbAddr string = "host=0.0.0.0 port=26257 user=mainflux dbname=manager sslmode=disable"
 	secret string = "token-secret"
 )
 

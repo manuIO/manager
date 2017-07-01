@@ -10,8 +10,6 @@ import (
 	"github.com/mainflux/manager"
 )
 
-const uniqueErr string = "unique_violation"
-
 var _ manager.UserRepository = (*userRepository)(nil)
 
 type userRepository struct {

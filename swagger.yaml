@@ -582,6 +582,11 @@ definitions:
         description: |
           Free-form application name. Note that the name does not uniquely
           identify applications.
+      key:
+        type: string
+        description: |
+          Auto-generated application access key. Any value provided by the API
+          clients will be ignored.
       channels:
         type: array
         description: Identifiers of channels the application is allowed to use.
@@ -648,6 +653,11 @@ definitions:
       description:
         type: string
         description: Free-form device description.
+      key:
+        type: string
+        description: |
+          Auto-generated device access key. Any value provided by the API
+          clients will be ignored.
       channels:
         type: array
         description: Identifiers of channels the device is allowed to use.

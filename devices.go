@@ -4,7 +4,7 @@ package manager
 // it is assigned with the unique identifier.
 type Device struct {
 	ID          uint   `json:"id"`
-	Owner       string `json:"owner"`
+	Owner       string `json:"-"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Channels    []uint `json:"channels"`

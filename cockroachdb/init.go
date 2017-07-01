@@ -5,6 +5,11 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+const (
+	uniqueErr string = "unique_violation"
+	fkErr     string = "foreign key violation"
+)
+
 // Connect establishes connection to the CockroachDB cluster.
 func Connect(addr string) (*gorm.DB, error) {
 	db, err := gorm.Open("postgres", addr)
@@ -12,8 +17,7 @@ func Connect(addr string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&userRecord{})
-	db.AutoMigrate(&deviceRecord{})
+	db.AutoMigrate(&userRecord{}, &deviceRecord{})
 	db.LogMode(false)
 
 	return db, nil

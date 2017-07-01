@@ -1,8 +1,11 @@
 package cockroachdb
 
 import (
+	"strings"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/lib/pq"
 	"github.com/mainflux/manager"
 )
 
@@ -14,7 +17,7 @@ type deviceRepository struct {
 
 type deviceRecord struct {
 	gorm.Model
-	Owner       string `gorm:"type:varchar(254);not null"`
+	OwnerID     string `sql:"type:varchar(254) REFERENCES users(email)"`
 	Name        string `gorm:"type:varchar(50);not null"`
 	Description string
 	Channels    string
@@ -32,26 +35,31 @@ func NewDeviceRepository(db *gorm.DB) manager.DeviceRepository {
 
 func (dr *deviceRepository) Save(device manager.Device) (uint, error) {
 	rec := &deviceRecord{
-		Owner:       device.Owner,
+		OwnerID:     device.Owner,
 		Name:        device.Name,
 		Description: device.Description,
 		Channels:    toString(device.Channels),
 	}
 
 	err := dr.db.Create(rec).Error
+
+	if pqErr, ok := err.(*pq.Error); ok && strings.Contains(pqErr.Message, fkErr) {
+		return 0, manager.ErrUnauthorizedAccess
+	}
+
 	return rec.ID, err
 }
 
 func (dr *deviceRepository) One(id uint, owner string) (manager.Device, error) {
 	rec := &deviceRecord{}
 
-	if dr.db.Where("id = ? AND owner = ?", id, owner).First(rec).RecordNotFound() {
+	if dr.db.Where("id = ? AND owner_id = ?", id, owner).First(rec).RecordNotFound() {
 		return manager.Device{}, manager.ErrNotFound
 	}
 
 	device := manager.Device{
 		ID:          rec.ID,
-		Owner:       rec.Owner,
+		Owner:       rec.OwnerID,
 		Name:        rec.Name,
 		Description: rec.Description,
 		Channels:    fromString(rec.Channels),
