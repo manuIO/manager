@@ -60,3 +60,12 @@ func (ms *metricService) DeviceInfo(key string, id uint) (manager.Device, error)
 
 	return ms.Service.DeviceInfo(key, id)
 }
+
+func (ms *metricService) RemoveDevice(key string, id uint) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "remove_device").Add(1)
+		ms.latency.With("method", "remove_device").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.RemoveDevice(key, id)
+}

@@ -218,8 +218,6 @@ paths:
           description: Application removed.
         403:
           description: Missing or invalid access token provided.
-        404:
-          description: Application does not exist.
         500:
           description: Unexpected server-side error occured.
   /devices:
@@ -385,8 +383,6 @@ paths:
           description: Device removed.
         403:
           description: Missing or invalid access token provided.
-        404:
-          description: Device does not exist.
         500:
           description: Unexpected server-side error occured.
   /channels:
@@ -552,8 +548,6 @@ paths:
           description: Channel removed.
         403:
           description: Missing or invalid access token provided.
-        404:
-          description: Channel does not exist.
         500:
           description: Unexpected server-side error occured.
 

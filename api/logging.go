@@ -72,3 +72,16 @@ func (ls *loggingService) DeviceInfo(key string, id uint) (device manager.Device
 
 	return ls.Service.DeviceInfo(key, id)
 }
+
+func (ls *loggingService) RemoveDevice(key string, id uint) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "remove_device",
+			"id", id,
+			"took", time.Since(begin),
+			"error", err,
+		)
+	}(time.Now())
+
+	return ls.Service.RemoveDevice(key, id)
+}

@@ -74,3 +74,18 @@ func (dir deviceInfoResponse) headers() map[string]string {
 func (dir deviceInfoResponse) empty() bool {
 	return false
 }
+
+type deviceRemovalResponse struct {
+}
+
+func (drr deviceRemovalResponse) code() int {
+	return http.StatusNoContent
+}
+
+func (drr deviceRemovalResponse) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (drr deviceRemovalResponse) empty() bool {
+	return true
+}

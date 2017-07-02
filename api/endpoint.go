@@ -53,3 +53,15 @@ func makeDeviceInfoEndpoint(s manager.Service) endpoint.Endpoint {
 		return deviceInfoResponse{device}, nil
 	}
 }
+
+func makeRemoveDeviceEndpoint(s manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		dir := request.(deviceInfoRequest)
+
+		if err := s.RemoveDevice(dir.key, dir.id); err != nil {
+			return nil, err
+		}
+
+		return deviceRemovalResponse{}, nil
+	}
+}

@@ -37,6 +37,10 @@ type Service interface {
 	CreateDevice(string, Device) (uint, error)
 
 	// DeviceInfo retrieves data about the device belonging to the user
-	// identified by the provided key and identified by the provided device ID.
+	// identified by the provided key having the provided device ID.
 	DeviceInfo(string, uint) (Device, error)
+
+	// RemoveDevice removes device belonging to the user identified by the
+	// provided key having the provided device ID.
+	RemoveDevice(string, uint) error
 }

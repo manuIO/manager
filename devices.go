@@ -28,5 +28,9 @@ type DeviceRepository interface {
 
 	// One retrieves the device identified by the provided unique ID and owned
 	// by the specified user.
-	One(uint, string) (Device, error)
+	One(string, uint) (Device, error)
+
+	// Remove removes the device identified by the provided unique ID and owned
+	// by the specified user.
+	Remove(string, uint) error
 }

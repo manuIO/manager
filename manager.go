@@ -68,5 +68,14 @@ func (ms *managerService) DeviceInfo(key string, id uint) (Device, error) {
 		return Device{}, err
 	}
 
-	return ms.devices.One(id, sub)
+	return ms.devices.One(sub, id)
+}
+
+func (ms *managerService) RemoveDevice(key string, id uint) error {
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return err
+	}
+
+	return ms.devices.Remove(sub, id)
 }

@@ -90,3 +90,21 @@ func TestDeviceInfo(t *testing.T) {
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }
+
+func TestRemoveDevice(t *testing.T) {
+	var cases = []struct {
+		id  uint
+		key string
+		err error
+	}{
+		{1, "", manager.ErrUnauthorizedAccess},
+		{1, "foo@bar.com", nil},
+		{1, "foo@bar.com", nil},
+		{2, "foo@bar.com", nil},
+	}
+
+	for _, tc := range cases {
+		err := svc.RemoveDevice(tc.key, tc.id)
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}

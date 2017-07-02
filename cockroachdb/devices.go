@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/lib/pq"
 	"github.com/mainflux/manager"
 )
@@ -52,7 +51,7 @@ func (dr *deviceRepository) Save(device manager.Device) (uint, error) {
 	return rec.ID, err
 }
 
-func (dr *deviceRepository) One(id uint, owner string) (manager.Device, error) {
+func (dr *deviceRepository) One(owner string, id uint) (manager.Device, error) {
 	rec := &deviceRecord{}
 
 	if dr.db.Where("id = ? AND owner_id = ?", id, owner).First(rec).RecordNotFound() {
@@ -69,4 +68,13 @@ func (dr *deviceRepository) One(id uint, owner string) (manager.Device, error) {
 	}
 
 	return device, nil
+}
+
+func (dr *deviceRepository) Remove(owner string, id uint) error {
+	rec := &deviceRecord{
+		Model:   gorm.Model{ID: id},
+		OwnerID: owner,
+	}
+
+	return dr.db.Delete(rec).Error
 }

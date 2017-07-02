@@ -1,9 +1,6 @@
 package cockroachdb
 
-import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-)
+import "github.com/jinzhu/gorm"
 
 const (
 	uniqueErr string = "unique_violation"

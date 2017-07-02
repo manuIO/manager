@@ -38,7 +38,7 @@ func (dr *deviceRepositoryMock) Save(device manager.Device) (uint, error) {
 	return dr.counter, nil
 }
 
-func (dr *deviceRepositoryMock) One(id uint, owner string) (manager.Device, error) {
+func (dr *deviceRepositoryMock) One(owner string, id uint) (manager.Device, error) {
 	device := manager.Device{
 		ID:    id,
 		Owner: owner,
@@ -53,4 +53,15 @@ func (dr *deviceRepositoryMock) One(id uint, owner string) (manager.Device, erro
 
 func key(device manager.Device) string {
 	return fmt.Sprintf("%d-%d", device.Owner, device.ID)
+}
+
+func (dr *deviceRepositoryMock) Remove(owner string, id uint) error {
+	device := manager.Device{
+		ID:    id,
+		Owner: owner,
+	}
+
+	delete(dr.devices, key(device))
+
+	return nil
 }

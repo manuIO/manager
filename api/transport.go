@@ -46,12 +46,20 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	)
 
+	removeDeviceHandler := kithttp.NewServer(
+		makeRemoveDeviceEndpoint(svc),
+		decodeDeviceInfoRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	r := bone.New()
 
 	r.Post("/users", registrationHandler)
 	r.Post("/tokens", loginHandler)
 	r.Post("/devices", deviceCreationHandler)
 	r.Get("/devices/:id", deviceInfoHandler)
+	r.Delete("/devices/:id", removeDeviceHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
