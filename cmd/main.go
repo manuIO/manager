@@ -13,27 +13,30 @@ import (
 	"github.com/mainflux/manager"
 	"github.com/mainflux/manager/api"
 	"github.com/mainflux/manager/bcrypt"
-	"github.com/mainflux/manager/cockroachdb"
 	"github.com/mainflux/manager/jwt"
+	"github.com/mainflux/manager/mocks"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 const (
-	port   int    = 8180
-	dbAddr string = "host=0.0.0.0 port=26257 user=mainflux dbname=manager sslmode=disable"
-	secret string = "token-secret"
+	port     int    = 8180
+	cluster  string = "0.0.0.0"
+	keyspace string = "manager"
+	secret   string = "token-secret"
 )
 
 type flags struct {
-	Port   int
-	DbAddr string
-	Secret string
+	Port     int
+	Cluster  string
+	Keyspace string
+	Secret   string
 }
 
 func main() {
 	var cfg flags
 	flag.IntVar(&cfg.Port, "port", port, "HTTP server port")
-	flag.StringVar(&cfg.DbAddr, "db", dbAddr, "database connection string")
+	flag.StringVar(&cfg.Cluster, "cluster", cluster, "comma-separated cluster addresses")
+	flag.StringVar(&cfg.Keyspace, "keyspace", keyspace, "cassandra keyspace to use")
 	flag.StringVar(&cfg.Secret, "secret", secret, "access token signing secret")
 	flag.Parse()
 
@@ -43,14 +46,8 @@ func main() {
 
 	var fields = []string{"method"}
 
-	db, err := cockroachdb.Connect(cfg.DbAddr)
-	if err != nil {
-		os.Exit(1)
-	}
-	defer db.Close()
-
-	users := cockroachdb.NewUserRepository(db)
-	devices := cockroachdb.NewDeviceRepository(db)
+	users := mocks.NewUserRepository()
+	devices := mocks.NewDeviceRepository()
 	hasher := bcrypt.NewHasher()
 	idp := jwt.NewIdentityProvider(cfg.Secret)
 
