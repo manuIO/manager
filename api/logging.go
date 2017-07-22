@@ -45,7 +45,7 @@ func (ls *loggingService) Login(user manager.User) (token string, err error) {
 	return ls.Service.Login(user)
 }
 
-func (ls *loggingService) CreateDevice(key string, device manager.Device) (id uint, err error) {
+func (ls *loggingService) CreateDevice(key string, device manager.Device) (id string, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "create_device",
@@ -59,7 +59,7 @@ func (ls *loggingService) CreateDevice(key string, device manager.Device) (id ui
 	return ls.Service.CreateDevice(key, device)
 }
 
-func (ls *loggingService) DeviceInfo(key string, id uint) (device manager.Device, err error) {
+func (ls *loggingService) DeviceInfo(key string, id string) (device manager.Device, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "device_info",
@@ -73,7 +73,7 @@ func (ls *loggingService) DeviceInfo(key string, id uint) (device manager.Device
 	return ls.Service.DeviceInfo(key, id)
 }
 
-func (ls *loggingService) RemoveDevice(key string, id uint) (err error) {
+func (ls *loggingService) RemoveDevice(key string, id string) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "remove_device",

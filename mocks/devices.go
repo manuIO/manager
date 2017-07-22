@@ -2,6 +2,7 @@ package mocks
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 
 	"github.com/mainflux/manager"
@@ -11,7 +12,7 @@ var _ manager.DeviceRepository = (*deviceRepositoryMock)(nil)
 
 type deviceRepositoryMock struct {
 	mu      sync.Mutex
-	counter uint
+	counter int
 	devices map[string]manager.Device
 }
 
@@ -22,23 +23,23 @@ func NewDeviceRepository() manager.DeviceRepository {
 	}
 }
 
-func (dr *deviceRepositoryMock) Save(device manager.Device) (uint, error) {
+func (dr *deviceRepositoryMock) Save(device manager.Device) (string, error) {
 	dr.mu.Lock()
 	defer dr.mu.Unlock()
 
-	if _, ok := dr.devices[key(device)]; ok {
-		return dr.counter, nil
+	if d, ok := dr.devices[key(device)]; ok {
+		return d.ID, nil
 	}
 
 	dr.counter += 1
-	device.ID = dr.counter
+	device.ID = strconv.Itoa(dr.counter)
 
 	dr.devices[key(device)] = device
 
-	return dr.counter, nil
+	return device.ID, nil
 }
 
-func (dr *deviceRepositoryMock) One(owner string, id uint) (manager.Device, error) {
+func (dr *deviceRepositoryMock) One(owner string, id string) (manager.Device, error) {
 	device := manager.Device{
 		ID:    id,
 		Owner: owner,
@@ -52,10 +53,10 @@ func (dr *deviceRepositoryMock) One(owner string, id uint) (manager.Device, erro
 }
 
 func key(device manager.Device) string {
-	return fmt.Sprintf("%d-%d", device.Owner, device.ID)
+	return fmt.Sprintf("%s-%s", device.Owner, device.ID)
 }
 
-func (dr *deviceRepositoryMock) Remove(owner string, id uint) error {
+func (dr *deviceRepositoryMock) Remove(owner string, id string) error {
 	device := manager.Device{
 		ID:    id,
 		Owner: owner,

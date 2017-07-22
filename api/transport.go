@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
@@ -89,11 +88,9 @@ func decodeCreateDeviceRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 func decodeDeviceInfoRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	id, _ := strconv.ParseUint(bone.GetValue(r, "id"), 0, 0)
-
 	dir := deviceInfoRequest{
 		key: r.Header.Get("Authorization"),
-		id:  uint(id),
+		id:  bone.GetValue(r, "id"),
 	}
 
 	return dir, nil

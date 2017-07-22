@@ -56,15 +56,15 @@ func TestCreateDevice(t *testing.T) {
 	var cases = []struct {
 		key    string
 		device manager.Device
-		id     uint
+		id     string
 		err    error
 	}{
-		{"foo@bar.com", manager.Device{Name: "a"}, 1, nil},
-		{"foo@bar.com", manager.Device{Name: "b"}, 2, nil},
-		{"foo@bar.com", manager.Device{Name: "c"}, 3, nil},
-		{"foo@bar.com", manager.Device{ID: 3, Name: "c"}, 3, nil},
-		{"", manager.Device{Name: "d"}, 0, manager.ErrUnauthorizedAccess},
-		{"foo@bar.com", manager.Device{}, 0, manager.ErrMalformedDevice},
+		{"foo@bar.com", manager.Device{Name: "a"}, "1", nil},
+		{"foo@bar.com", manager.Device{Name: "b"}, "2", nil},
+		{"foo@bar.com", manager.Device{Name: "c"}, "3", nil},
+		{"foo@bar.com", manager.Device{ID: "3", Name: "c"}, "3", nil},
+		{"", manager.Device{Name: "d"}, "", manager.ErrUnauthorizedAccess},
+		{"foo@bar.com", manager.Device{}, "", manager.ErrMalformedDevice},
 	}
 
 	for _, tc := range cases {
@@ -76,13 +76,13 @@ func TestCreateDevice(t *testing.T) {
 
 func TestDeviceInfo(t *testing.T) {
 	var cases = []struct {
-		id  uint
+		id  string
 		key string
 		err error
 	}{
-		{1, "foo@bar.com", nil},
-		{1, "", manager.ErrUnauthorizedAccess},
-		{5, "foo@bar.com", manager.ErrNotFound},
+		{"1", "foo@bar.com", nil},
+		{"1", "", manager.ErrUnauthorizedAccess},
+		{"5", "foo@bar.com", manager.ErrNotFound},
 	}
 
 	for _, tc := range cases {
@@ -93,14 +93,14 @@ func TestDeviceInfo(t *testing.T) {
 
 func TestRemoveDevice(t *testing.T) {
 	var cases = []struct {
-		id  uint
+		id  string
 		key string
 		err error
 	}{
-		{1, "", manager.ErrUnauthorizedAccess},
-		{1, "foo@bar.com", nil},
-		{1, "foo@bar.com", nil},
-		{2, "foo@bar.com", nil},
+		{"1", "", manager.ErrUnauthorizedAccess},
+		{"1", "foo@bar.com", nil},
+		{"1", "foo@bar.com", nil},
+		{"2", "foo@bar.com", nil},
 	}
 
 	for _, tc := range cases {

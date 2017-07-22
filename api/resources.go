@@ -37,7 +37,7 @@ type createDeviceRequest struct {
 }
 
 type createDeviceResponse struct {
-	id uint
+	id string
 }
 
 func (cdr createDeviceResponse) code() int {
@@ -46,7 +46,7 @@ func (cdr createDeviceResponse) code() int {
 
 func (cdr createDeviceResponse) headers() map[string]string {
 	return map[string]string{
-		"Location": fmt.Sprintf("/devices/%d", cdr.id),
+		"Location": fmt.Sprint("/devices/", cdr.id),
 	}
 }
 
@@ -55,7 +55,7 @@ func (cdr createDeviceResponse) empty() bool {
 }
 
 type deviceInfoRequest struct {
-	id  uint
+	id  string
 	key string
 }
 

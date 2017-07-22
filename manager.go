@@ -46,14 +46,14 @@ func (ms *managerService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *managerService) CreateDevice(key string, device Device) (uint, error) {
+func (ms *managerService) CreateDevice(key string, device Device) (string, error) {
 	if err := device.validate(); err != nil {
-		return 0, err
+		return "", err
 	}
 
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	device.Owner = sub
@@ -62,7 +62,7 @@ func (ms *managerService) CreateDevice(key string, device Device) (uint, error) 
 	return ms.devices.Save(device)
 }
 
-func (ms *managerService) DeviceInfo(key string, id uint) (Device, error) {
+func (ms *managerService) DeviceInfo(key string, id string) (Device, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return Device{}, err
@@ -71,7 +71,7 @@ func (ms *managerService) DeviceInfo(key string, id uint) (Device, error) {
 	return ms.devices.One(sub, id)
 }
 
-func (ms *managerService) RemoveDevice(key string, id uint) error {
+func (ms *managerService) RemoveDevice(key string, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err

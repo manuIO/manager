@@ -34,13 +34,13 @@ type Service interface {
 	Login(User) (string, error)
 
 	// CreateDevice adds new device to the user identified by the provided key.
-	CreateDevice(string, Device) (uint, error)
+	CreateDevice(string, Device) (string, error)
 
 	// DeviceInfo retrieves data about the device belonging to the user
 	// identified by the provided key having the provided device ID.
-	DeviceInfo(string, uint) (Device, error)
+	DeviceInfo(string, string) (Device, error)
 
 	// RemoveDevice removes device belonging to the user identified by the
 	// provided key having the provided device ID.
-	RemoveDevice(string, uint) error
+	RemoveDevice(string, string) error
 }

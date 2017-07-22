@@ -43,7 +43,7 @@ func (ms *metricService) Login(user manager.User) (string, error) {
 	return ms.Service.Login(user)
 }
 
-func (ms *metricService) CreateDevice(key string, device manager.Device) (uint, error) {
+func (ms *metricService) CreateDevice(key string, device manager.Device) (string, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "create_device").Add(1)
 		ms.latency.With("method", "create_device").Observe(time.Since(begin).Seconds())
@@ -52,7 +52,7 @@ func (ms *metricService) CreateDevice(key string, device manager.Device) (uint, 
 	return ms.Service.CreateDevice(key, device)
 }
 
-func (ms *metricService) DeviceInfo(key string, id uint) (manager.Device, error) {
+func (ms *metricService) DeviceInfo(key string, id string) (manager.Device, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "device_info").Add(1)
 		ms.latency.With("method", "device_info").Observe(time.Since(begin).Seconds())
@@ -61,7 +61,7 @@ func (ms *metricService) DeviceInfo(key string, id uint) (manager.Device, error)
 	return ms.Service.DeviceInfo(key, id)
 }
 
-func (ms *metricService) RemoveDevice(key string, id uint) error {
+func (ms *metricService) RemoveDevice(key string, id string) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "remove_device").Add(1)
 		ms.latency.With("method", "remove_device").Observe(time.Since(begin).Seconds())
