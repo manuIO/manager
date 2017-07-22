@@ -33,12 +33,12 @@ type Service interface {
 	// identified by the non-nil error values in the response.
 	Login(User) (string, error)
 
-	// CreateClient adds new client to the user identified by the provided key.
-	CreateClient(string, Client) (string, error)
+	// AddClient adds new client to the user identified by the provided key.
+	AddClient(string, Client) (string, error)
 
-	// ClientInfo retrieves data about the client identified with the provided
+	// ViewClient retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
-	ClientInfo(string, string) (Client, error)
+	ViewClient(string, string) (Client, error)
 
 	// RemoveClient removes client identified with the provided ID, that
 	// belongs to the user identified by the provided key.

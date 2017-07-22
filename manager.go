@@ -34,7 +34,7 @@ func (ms *managerService) Register(user User) error {
 }
 
 func (ms *managerService) Login(user User) (string, error) {
-	dbUser, err := ms.users.Get(user.Email)
+	dbUser, err := ms.users.One(user.Email)
 	if err != nil {
 		return "", ErrInvalidCredentials
 	}
@@ -46,7 +46,7 @@ func (ms *managerService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *managerService) CreateClient(key string, client Client) (string, error) {
+func (ms *managerService) AddClient(key string, client Client) (string, error) {
 	if err := client.validate(); err != nil {
 		return "", err
 	}
@@ -62,7 +62,7 @@ func (ms *managerService) CreateClient(key string, client Client) (string, error
 	return ms.clients.Save(client)
 }
 
-func (ms *managerService) ClientInfo(key string, id string) (Client, error) {
+func (ms *managerService) ViewClient(key string, id string) (Client, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return Client{}, err

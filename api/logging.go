@@ -45,10 +45,10 @@ func (ls *loggingService) Login(user manager.User) (token string, err error) {
 	return ls.Service.Login(user)
 }
 
-func (ls *loggingService) CreateDevice(key string, client manager.Client) (id string, err error) {
+func (ls *loggingService) AddClient(key string, client manager.Client) (id string, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
-			"method", "create_client",
+			"method", "add_client",
 			"owner", client.Owner,
 			"id", id,
 			"took", time.Since(begin),
@@ -56,13 +56,13 @@ func (ls *loggingService) CreateDevice(key string, client manager.Client) (id st
 		)
 	}(time.Now())
 
-	return ls.Service.CreateClient(key, client)
+	return ls.Service.AddClient(key, client)
 }
 
-func (ls *loggingService) ClientInfo(key string, id string) (client manager.Client, err error) {
+func (ls *loggingService) ViewClient(key string, id string) (client manager.Client, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
-			"method", "client_info",
+			"method", "view_client",
 			"owner", client.Owner,
 			"id", id,
 			"took", time.Since(begin),
@@ -70,7 +70,7 @@ func (ls *loggingService) ClientInfo(key string, id string) (client manager.Clie
 		)
 	}(time.Now())
 
-	return ls.Service.ClientInfo(key, id)
+	return ls.Service.ViewClient(key, id)
 }
 
 func (ls *loggingService) RemoveClient(key string, id string) (err error) {

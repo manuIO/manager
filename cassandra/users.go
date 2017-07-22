@@ -20,6 +20,6 @@ func (ur *userRepository) Save(user manager.User) error {
 	return manager.ErrConflict
 }
 
-func (ur *userRepository) Get(email string) (manager.User, error) {
-	return manager.User{}, manager.ErrConflict
+func (ur *userRepository) One(email string) (manager.User, error) {
+	return manager.User{}, manager.ErrNotFound
 }

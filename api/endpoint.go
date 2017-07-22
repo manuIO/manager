@@ -7,61 +7,61 @@ import (
 	"github.com/mainflux/manager"
 )
 
-func makeRegistrationEndpoint(s manager.Service) endpoint.Endpoint {
+func registrationEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		user := request.(manager.User)
-		err := s.Register(user)
-		return tokenResponse{}, err
+		err := svc.Register(user)
+		return tokenRep{}, err
 	}
 }
 
-func makeLoginEndpoint(s manager.Service) endpoint.Endpoint {
+func loginEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		user := request.(manager.User)
 
-		token, err := s.Login(user)
+		token, err := svc.Login(user)
 		if err != nil {
 			return nil, err
 		}
 
-		return tokenResponse{token}, nil
+		return tokenRep{token}, nil
 	}
 }
 
-func makeCreateClientEndpoint(s manager.Service) endpoint.Endpoint {
+func addClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		cdr := request.(createClientRequest)
+		req := request.(addClientReq)
 
-		id, err := s.CreateClient(cdr.key, cdr.client)
+		id, err := svc.AddClient(req.key, req.client)
 		if err != nil {
 			return nil, err
 		}
 
-		return createClientResponse{id}, nil
+		return addClientRep{id}, nil
 	}
 }
 
-func makeClientInfoEndpoint(s manager.Service) endpoint.Endpoint {
+func viewClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		cir := request.(clientInfoRequest)
+		req := request.(viewClientReq)
 
-		client, err := s.ClientInfo(cir.key, cir.id)
+		client, err := svc.ViewClient(req.key, req.id)
 		if err != nil {
 			return nil, err
 		}
 
-		return clientInfoResponse{client}, nil
+		return viewClientRep{client}, nil
 	}
 }
 
-func makeRemoveClientEndpoint(s manager.Service) endpoint.Endpoint {
+func removeClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		cir := request.(clientInfoRequest)
+		req := request.(viewClientReq)
 
-		if err := s.RemoveClient(cir.key, cir.id); err != nil {
+		if err := svc.RemoveClient(req.key, req.id); err != nil {
 			return nil, err
 		}
 
-		return clientRemovalResponse{}, nil
+		return viewClientRep{}, nil
 	}
 }

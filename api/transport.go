@@ -17,54 +17,54 @@ func MakeHandler(svc manager.Service) http.Handler {
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
-	registrationHandler := kithttp.NewServer(
-		makeRegistrationEndpoint(svc),
-		decodeCredentialsRequest,
+	registration := kithttp.NewServer(
+		registrationEndpoint(svc),
+		decodeCredentials,
 		encodeResponse,
 		opts...,
 	)
 
-	loginHandler := kithttp.NewServer(
-		makeLoginEndpoint(svc),
-		decodeCredentialsRequest,
+	login := kithttp.NewServer(
+		loginEndpoint(svc),
+		decodeCredentials,
 		encodeResponse,
 		opts...,
 	)
 
-	clientCreationHandler := kithttp.NewServer(
-		makeCreateClientEndpoint(svc),
-		decodeCreateClientRequest,
+	addClient := kithttp.NewServer(
+		addClientEndpoint(svc),
+		decodeAddClient,
 		encodeResponse,
 		opts...,
 	)
 
-	clientInfoHandler := kithttp.NewServer(
-		makeClientInfoEndpoint(svc),
-		decodeClientInfoRequest,
+	viewClient := kithttp.NewServer(
+		viewClientEndpoint(svc),
+		decodeViewClient,
 		encodeResponse,
 		opts...,
 	)
 
-	removeClientHandler := kithttp.NewServer(
-		makeRemoveClientEndpoint(svc),
-		decodeClientInfoRequest,
+	removeClient := kithttp.NewServer(
+		removeClientEndpoint(svc),
+		decodeViewClient,
 		encodeResponse,
 		opts...,
 	)
 
 	r := bone.New()
 
-	r.Post("/users", registrationHandler)
-	r.Post("/tokens", loginHandler)
-	r.Post("/clients", clientCreationHandler)
-	r.Get("/clients/:id", clientInfoHandler)
-	r.Delete("/clients/:id", removeClientHandler)
+	r.Post("/users", registration)
+	r.Post("/tokens", login)
+	r.Post("/clients", addClient)
+	r.Get("/clients/:id", viewClient)
+	r.Delete("/clients/:id", removeClient)
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
 
-func decodeCredentialsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
 	var user manager.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		return nil, err
@@ -73,27 +73,27 @@ func decodeCredentialsRequest(_ context.Context, r *http.Request) (interface{}, 
 	return user, nil
 }
 
-func decodeCreateClientRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeAddClient(_ context.Context, r *http.Request) (interface{}, error) {
 	var client manager.Client
 	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
 		return nil, err
 	}
 
-	cdr := createClientRequest{
+	req := addClientReq{
 		key:    r.Header.Get("Authorization"),
 		client: client,
 	}
 
-	return cdr, nil
+	return req, nil
 }
 
-func decodeClientInfoRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	cir := clientInfoRequest{
+func decodeViewClient(_ context.Context, r *http.Request) (interface{}, error) {
+	req := viewClientReq{
 		key: r.Header.Get("Authorization"),
 		id:  bone.GetValue(r, "id"),
 	}
 
-	return cir, nil
+	return req, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {

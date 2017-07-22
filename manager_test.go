@@ -52,7 +52,7 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func TestCreateClient(t *testing.T) {
+func TestAddClient(t *testing.T) {
 	var cases = []struct {
 		key    string
 		client manager.Client
@@ -68,13 +68,13 @@ func TestCreateClient(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		id, err := svc.CreateClient(tc.key, tc.client)
+		id, err := svc.AddClient(tc.key, tc.client)
 		assert.Equal(t, tc.id, id, "unexpected id retrieved")
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }
 
-func TestClientInfo(t *testing.T) {
+func TestViewClient(t *testing.T) {
 	var cases = []struct {
 		id  string
 		key string
@@ -86,7 +86,7 @@ func TestClientInfo(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		_, err := svc.ClientInfo(tc.key, tc.id)
+		_, err := svc.ViewClient(tc.key, tc.id)
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }

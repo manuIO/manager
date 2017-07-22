@@ -15,77 +15,76 @@ type apiResponse interface {
 	empty() bool
 }
 
-type tokenResponse struct {
+type tokenRep struct {
 	Token string `json:"token,omitempty"`
 }
 
-func (tr tokenResponse) code() int {
+func (rep tokenRep) code() int {
 	return http.StatusCreated
 }
 
-func (tr tokenResponse) headers() map[string]string {
+func (rep tokenRep) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (tr tokenResponse) empty() bool {
-	return tr.Token == ""
+func (rep tokenRep) empty() bool {
+	return rep.Token == ""
 }
 
-type createClientRequest struct {
+type addClientReq struct {
 	client manager.Client
 	key    string
 }
 
-type createClientResponse struct {
+type addClientRep struct {
 	id string
 }
 
-func (ccr createClientResponse) code() int {
+func (rep addClientRep) code() int {
 	return http.StatusCreated
 }
 
-func (ccr createClientResponse) headers() map[string]string {
+func (rep addClientRep) headers() map[string]string {
 	return map[string]string{
-		"Location": fmt.Sprint("/clients/", ccr.id),
+		"Location": fmt.Sprint("/clients/", rep.id),
 	}
 }
 
-func (ccr createClientResponse) empty() bool {
+func (rep addClientRep) empty() bool {
 	return true
 }
 
-type clientInfoRequest struct {
+type viewClientReq struct {
 	id  string
 	key string
 }
 
-type clientInfoResponse struct {
+type viewClientRep struct {
 	manager.Client
 }
 
-func (cir clientInfoResponse) code() int {
+func (rep viewClientRep) code() int {
 	return http.StatusOK
 }
 
-func (cir clientInfoResponse) headers() map[string]string {
+func (rep viewClientRep) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (cir clientInfoResponse) empty() bool {
+func (rep viewClientRep) empty() bool {
 	return false
 }
 
-type clientRemovalResponse struct {
-}
+type removeClientRep struct{}
 
-func (crr clientRemovalResponse) code() int {
+func (rep removeClientRep) code() int {
 	return http.StatusNoContent
 }
 
-func (crr clientRemovalResponse) headers() map[string]string {
+func (rep removeClientRep) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (crr clientRemovalResponse) empty() bool {
+func (rep removeClientRep) empty() bool {
 	return true
 }

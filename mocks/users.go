@@ -32,7 +32,7 @@ func (ur *userRepositoryMock) Save(user manager.User) error {
 	return nil
 }
 
-func (ur *userRepositoryMock) Get(email string) (manager.User, error) {
+func (ur *userRepositoryMock) One(email string) (manager.User, error) {
 	ur.mu.Lock()
 	defer ur.mu.Unlock()
 
