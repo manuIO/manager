@@ -8,11 +8,11 @@ import (
 var _ manager.UserRepository = (*userRepository)(nil)
 
 type userRepository struct {
-	session gocql.Session
+	session *gocql.Session
 }
 
 // NewUserRepository instantiates Cassandra user repository.
-func NewUserRepository(session gocql.Session) manager.UserRepository {
+func NewUserRepository(session *gocql.Session) manager.UserRepository {
 	return &userRepository{session}
 }
 

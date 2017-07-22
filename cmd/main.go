@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/go-kit/kit/log"
@@ -13,13 +14,14 @@ import (
 	"github.com/mainflux/manager"
 	"github.com/mainflux/manager/api"
 	"github.com/mainflux/manager/bcrypt"
+	"github.com/mainflux/manager/cassandra"
 	"github.com/mainflux/manager/jwt"
-	"github.com/mainflux/manager/mocks"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 const (
 	port     int    = 8180
+	sep      string = ","
 	cluster  string = "0.0.0.0"
 	keyspace string = "manager"
 	secret   string = "token-secret"
@@ -46,8 +48,14 @@ func main() {
 
 	var fields = []string{"method"}
 
-	users := mocks.NewUserRepository()
-	clients := mocks.NewClientRepository()
+	session, err := cassandra.Connect(strings.Split(cfg.Cluster, sep), cfg.Keyspace)
+	if err != nil {
+		os.Exit(1)
+	}
+	defer session.Close()
+
+	users := cassandra.NewUserRepository(session)
+	clients := cassandra.NewClientRepository(session)
 	hasher := bcrypt.NewHasher()
 	idp := jwt.NewIdentityProvider(cfg.Secret)
 
