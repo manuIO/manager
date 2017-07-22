@@ -31,61 +31,61 @@ func (tr tokenResponse) empty() bool {
 	return tr.Token == ""
 }
 
-type createDeviceRequest struct {
-	device manager.Device
+type createClientRequest struct {
+	client manager.Client
 	key    string
 }
 
-type createDeviceResponse struct {
+type createClientResponse struct {
 	id string
 }
 
-func (cdr createDeviceResponse) code() int {
+func (ccr createClientResponse) code() int {
 	return http.StatusCreated
 }
 
-func (cdr createDeviceResponse) headers() map[string]string {
+func (ccr createClientResponse) headers() map[string]string {
 	return map[string]string{
-		"Location": fmt.Sprint("/devices/", cdr.id),
+		"Location": fmt.Sprint("/clients/", ccr.id),
 	}
 }
 
-func (cdr createDeviceResponse) empty() bool {
+func (ccr createClientResponse) empty() bool {
 	return true
 }
 
-type deviceInfoRequest struct {
+type clientInfoRequest struct {
 	id  string
 	key string
 }
 
-type deviceInfoResponse struct {
-	manager.Device
+type clientInfoResponse struct {
+	manager.Client
 }
 
-func (dir deviceInfoResponse) code() int {
+func (cir clientInfoResponse) code() int {
 	return http.StatusOK
 }
 
-func (dir deviceInfoResponse) headers() map[string]string {
+func (cir clientInfoResponse) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (dir deviceInfoResponse) empty() bool {
+func (cir clientInfoResponse) empty() bool {
 	return false
 }
 
-type deviceRemovalResponse struct {
+type clientRemovalResponse struct {
 }
 
-func (drr deviceRemovalResponse) code() int {
+func (crr clientRemovalResponse) code() int {
 	return http.StatusNoContent
 }
 
-func (drr deviceRemovalResponse) headers() map[string]string {
+func (crr clientRemovalResponse) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (drr deviceRemovalResponse) empty() bool {
+func (crr clientRemovalResponse) empty() bool {
 	return true
 }

@@ -31,23 +31,23 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	)
 
-	deviceCreationHandler := kithttp.NewServer(
-		makeCreateDeviceEndpoint(svc),
-		decodeCreateDeviceRequest,
+	clientCreationHandler := kithttp.NewServer(
+		makeCreateClientEndpoint(svc),
+		decodeCreateClientRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	deviceInfoHandler := kithttp.NewServer(
-		makeDeviceInfoEndpoint(svc),
-		decodeDeviceInfoRequest,
+	clientInfoHandler := kithttp.NewServer(
+		makeClientInfoEndpoint(svc),
+		decodeClientInfoRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	removeDeviceHandler := kithttp.NewServer(
-		makeRemoveDeviceEndpoint(svc),
-		decodeDeviceInfoRequest,
+	removeClientHandler := kithttp.NewServer(
+		makeRemoveClientEndpoint(svc),
+		decodeClientInfoRequest,
 		encodeResponse,
 		opts...,
 	)
@@ -56,9 +56,9 @@ func MakeHandler(svc manager.Service) http.Handler {
 
 	r.Post("/users", registrationHandler)
 	r.Post("/tokens", loginHandler)
-	r.Post("/devices", deviceCreationHandler)
-	r.Get("/devices/:id", deviceInfoHandler)
-	r.Delete("/devices/:id", removeDeviceHandler)
+	r.Post("/clients", clientCreationHandler)
+	r.Get("/clients/:id", clientInfoHandler)
+	r.Delete("/clients/:id", removeClientHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
@@ -73,27 +73,27 @@ func decodeCredentialsRequest(_ context.Context, r *http.Request) (interface{}, 
 	return user, nil
 }
 
-func decodeCreateDeviceRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var device manager.Device
-	if err := json.NewDecoder(r.Body).Decode(&device); err != nil {
+func decodeCreateClientRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var client manager.Client
+	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
 		return nil, err
 	}
 
-	cdr := createDeviceRequest{
+	cdr := createClientRequest{
 		key:    r.Header.Get("Authorization"),
-		device: device,
+		client: client,
 	}
 
 	return cdr, nil
 }
 
-func decodeDeviceInfoRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	dir := deviceInfoRequest{
+func decodeClientInfoRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	cir := clientInfoRequest{
 		key: r.Header.Get("Authorization"),
 		id:  bone.GetValue(r, "id"),
 	}
 
-	return dir, nil
+	return cir, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
@@ -118,7 +118,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 
 	switch err {
-	case manager.ErrInvalidCredentials, manager.ErrMalformedDevice:
+	case manager.ErrInvalidCredentials, manager.ErrMalformedClient:
 		w.WriteHeader(http.StatusBadRequest)
 	case manager.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)

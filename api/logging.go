@@ -45,43 +45,43 @@ func (ls *loggingService) Login(user manager.User) (token string, err error) {
 	return ls.Service.Login(user)
 }
 
-func (ls *loggingService) CreateDevice(key string, device manager.Device) (id string, err error) {
+func (ls *loggingService) CreateDevice(key string, client manager.Client) (id string, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
-			"method", "create_device",
-			"owner", device.Owner,
+			"method", "create_client",
+			"owner", client.Owner,
 			"id", id,
 			"took", time.Since(begin),
 			"error", err,
 		)
 	}(time.Now())
 
-	return ls.Service.CreateDevice(key, device)
+	return ls.Service.CreateClient(key, client)
 }
 
-func (ls *loggingService) DeviceInfo(key string, id string) (device manager.Device, err error) {
+func (ls *loggingService) ClientInfo(key string, id string) (client manager.Client, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
-			"method", "device_info",
-			"owner", device.Owner,
+			"method", "client_info",
+			"owner", client.Owner,
 			"id", id,
 			"took", time.Since(begin),
 			"error", err,
 		)
 	}(time.Now())
 
-	return ls.Service.DeviceInfo(key, id)
+	return ls.Service.ClientInfo(key, id)
 }
 
-func (ls *loggingService) RemoveDevice(key string, id string) (err error) {
+func (ls *loggingService) RemoveClient(key string, id string) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
-			"method", "remove_device",
+			"method", "remove_client",
 			"id", id,
 			"took", time.Since(begin),
 			"error", err,
 		)
 	}(time.Now())
 
-	return ls.Service.RemoveDevice(key, id)
+	return ls.Service.RemoveClient(key, id)
 }

@@ -10,8 +10,8 @@ var (
 	// ErrInvalidCredentials indicates malformed account credentials.
 	ErrInvalidCredentials error = errors.New("invalid email or password")
 
-	// ErrMalformedDevice indicates malformed device specification (e.g. empty name).
-	ErrMalformedDevice error = errors.New("malformed device specification")
+	// ErrMalformedClient indicates malformed client specification (e.g. empty name).
+	ErrMalformedClient error = errors.New("malformed client specification")
 
 	// ErrUnauthorizedAccess indicates missing or invalid credentials provided
 	// when accessing a protected resource.
@@ -24,23 +24,23 @@ var (
 // Service specifies an API that must be fullfiled by the domain service
 // implementation, and all of its decorators (e.g. logging & metrics).
 type Service interface {
-	// Register created new user account. In case the registration fails, a
+	// Register creates new user account. In case of the failed registration, a
 	// non-nil error value is returned.
 	Register(User) error
 
-	// Login performs user authentication given its credentials. Successful
+	// Login authenticates the user given its credentials. Successful
 	// authentication generates new access token. Failed invocations are
-	// identified by the non-nil error values present in the response.
+	// identified by the non-nil error values in the response.
 	Login(User) (string, error)
 
-	// CreateDevice adds new device to the user identified by the provided key.
-	CreateDevice(string, Device) (string, error)
+	// CreateClient adds new client to the user identified by the provided key.
+	CreateClient(string, Client) (string, error)
 
-	// DeviceInfo retrieves data about the device belonging to the user
-	// identified by the provided key having the provided device ID.
-	DeviceInfo(string, string) (Device, error)
+	// ClientInfo retrieves data about the client identified with the provided
+	// ID, that belongs to the user identified by the provided key.
+	ClientInfo(string, string) (Client, error)
 
-	// RemoveDevice removes device belonging to the user identified by the
-	// provided key having the provided device ID.
-	RemoveDevice(string, string) error
+	// RemoveClient removes client identified with the provided ID, that
+	// belongs to the user identified by the provided key.
+	RemoveClient(string, string) error
 }

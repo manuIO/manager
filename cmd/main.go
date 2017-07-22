@@ -47,12 +47,12 @@ func main() {
 	var fields = []string{"method"}
 
 	users := mocks.NewUserRepository()
-	devices := mocks.NewDeviceRepository()
+	clients := mocks.NewClientRepository()
 	hasher := bcrypt.NewHasher()
 	idp := jwt.NewIdentityProvider(cfg.Secret)
 
 	var svc manager.Service
-	svc = manager.NewService(users, devices, hasher, idp)
+	svc = manager.NewService(users, clients, hasher, idp)
 	svc = api.NewLoggingService(logger, svc)
 	svc = api.NewMetricService(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{

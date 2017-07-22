@@ -4,16 +4,16 @@ var _ Service = (*managerService)(nil)
 
 type managerService struct {
 	users   UserRepository
-	devices DeviceRepository
+	clients ClientRepository
 	hasher  Hasher
 	idp     IdentityProvider
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(ur UserRepository, dr DeviceRepository, hasher Hasher, idp IdentityProvider) Service {
+func NewService(ur UserRepository, cr ClientRepository, hasher Hasher, idp IdentityProvider) Service {
 	return &managerService{
 		users:   ur,
-		devices: dr,
+		clients: cr,
 		hasher:  hasher,
 		idp:     idp,
 	}
@@ -46,8 +46,8 @@ func (ms *managerService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *managerService) CreateDevice(key string, device Device) (string, error) {
-	if err := device.validate(); err != nil {
+func (ms *managerService) CreateClient(key string, client Client) (string, error) {
+	if err := client.validate(); err != nil {
 		return "", err
 	}
 
@@ -56,26 +56,26 @@ func (ms *managerService) CreateDevice(key string, device Device) (string, error
 		return "", err
 	}
 
-	device.Owner = sub
-	device.Key, _ = ms.idp.PermanentKey(sub)
+	client.Owner = sub
+	client.Key, _ = ms.idp.PermanentKey(sub)
 
-	return ms.devices.Save(device)
+	return ms.clients.Save(client)
 }
 
-func (ms *managerService) DeviceInfo(key string, id string) (Device, error) {
+func (ms *managerService) ClientInfo(key string, id string) (Client, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
-		return Device{}, err
+		return Client{}, err
 	}
 
-	return ms.devices.One(sub, id)
+	return ms.clients.One(sub, id)
 }
 
-func (ms *managerService) RemoveDevice(key string, id string) error {
+func (ms *managerService) RemoveClient(key string, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	return ms.devices.Remove(sub, id)
+	return ms.clients.Remove(sub, id)
 }

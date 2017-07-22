@@ -28,40 +28,40 @@ func makeLoginEndpoint(s manager.Service) endpoint.Endpoint {
 	}
 }
 
-func makeCreateDeviceEndpoint(s manager.Service) endpoint.Endpoint {
+func makeCreateClientEndpoint(s manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		cdr := request.(createDeviceRequest)
+		cdr := request.(createClientRequest)
 
-		id, err := s.CreateDevice(cdr.key, cdr.device)
+		id, err := s.CreateClient(cdr.key, cdr.client)
 		if err != nil {
 			return nil, err
 		}
 
-		return createDeviceResponse{id}, nil
+		return createClientResponse{id}, nil
 	}
 }
 
-func makeDeviceInfoEndpoint(s manager.Service) endpoint.Endpoint {
+func makeClientInfoEndpoint(s manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		dir := request.(deviceInfoRequest)
+		cir := request.(clientInfoRequest)
 
-		device, err := s.DeviceInfo(dir.key, dir.id)
+		client, err := s.ClientInfo(cir.key, cir.id)
 		if err != nil {
 			return nil, err
 		}
 
-		return deviceInfoResponse{device}, nil
+		return clientInfoResponse{client}, nil
 	}
 }
 
-func makeRemoveDeviceEndpoint(s manager.Service) endpoint.Endpoint {
+func makeRemoveClientEndpoint(s manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		dir := request.(deviceInfoRequest)
+		cir := request.(clientInfoRequest)
 
-		if err := s.RemoveDevice(dir.key, dir.id); err != nil {
+		if err := s.RemoveClient(cir.key, cir.id); err != nil {
 			return nil, err
 		}
 
-		return deviceRemovalResponse{}, nil
+		return clientRemovalResponse{}, nil
 	}
 }
