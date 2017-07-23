@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/go-kit/kit/log"
@@ -13,27 +14,31 @@ import (
 	"github.com/mainflux/manager"
 	"github.com/mainflux/manager/api"
 	"github.com/mainflux/manager/bcrypt"
-	"github.com/mainflux/manager/cockroachdb"
+	"github.com/mainflux/manager/cassandra"
 	"github.com/mainflux/manager/jwt"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 const (
-	port   int    = 8180
-	dbAddr string = "host=0.0.0.0 port=26257 user=mainflux dbname=manager sslmode=disable"
-	secret string = "token-secret"
+	port     int    = 8180
+	sep      string = ","
+	cluster  string = "0.0.0.0"
+	keyspace string = "manager"
+	secret   string = "token-secret"
 )
 
 type flags struct {
-	Port   int
-	DbAddr string
-	Secret string
+	Port     int
+	Cluster  string
+	Keyspace string
+	Secret   string
 }
 
 func main() {
 	var cfg flags
 	flag.IntVar(&cfg.Port, "port", port, "HTTP server port")
-	flag.StringVar(&cfg.DbAddr, "db", dbAddr, "database connection string")
+	flag.StringVar(&cfg.Cluster, "cluster", cluster, "comma-separated cluster addresses")
+	flag.StringVar(&cfg.Keyspace, "keyspace", keyspace, "cassandra keyspace to use")
 	flag.StringVar(&cfg.Secret, "secret", secret, "access token signing secret")
 	flag.Parse()
 
@@ -43,19 +48,25 @@ func main() {
 
 	var fields = []string{"method"}
 
-	db, err := cockroachdb.Connect(cfg.DbAddr)
+	session, err := cassandra.Connect(strings.Split(cfg.Cluster, sep), cfg.Keyspace)
 	if err != nil {
+		logger.Log("error", err)
 		os.Exit(1)
 	}
-	defer db.Close()
+	defer session.Close()
 
-	users := cockroachdb.NewUserRepository(db)
-	devices := cockroachdb.NewDeviceRepository(db)
+	if err := cassandra.Initialize(session); err != nil {
+		logger.Log("error", err)
+		os.Exit(1)
+	}
+
+	users := cassandra.NewUserRepository(session)
+	clients := cassandra.NewClientRepository(session)
 	hasher := bcrypt.NewHasher()
 	idp := jwt.NewIdentityProvider(cfg.Secret)
 
 	var svc manager.Service
-	svc = manager.NewService(users, devices, hasher, idp)
+	svc = manager.NewService(users, clients, hasher, idp)
 	svc = api.NewLoggingService(logger, svc)
 	svc = api.NewMetricService(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{

@@ -9,10 +9,9 @@ devices, applications and channels. Through this API clients are able to do
 the following actions:
 
 - register new accounts and obtain access tokens
-- provision new devices
-- provision new applications
+- provision new clients (i.e. devices & applications)
 - create new channels
-- "plug" devices and applications into the channels
+- "connect" clients into the channels
 
 For in-depth explanation of the aforementioned scenarios, as well as thorough
 understanding of Mainflux, please check out the [official documentation][doc].

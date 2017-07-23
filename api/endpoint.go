@@ -7,61 +7,61 @@ import (
 	"github.com/mainflux/manager"
 )
 
-func makeRegistrationEndpoint(s manager.Service) endpoint.Endpoint {
+func registrationEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		user := request.(manager.User)
-		err := s.Register(user)
-		return tokenResponse{}, err
+		err := svc.Register(user)
+		return tokenRep{}, err
 	}
 }
 
-func makeLoginEndpoint(s manager.Service) endpoint.Endpoint {
+func loginEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		user := request.(manager.User)
 
-		token, err := s.Login(user)
+		token, err := svc.Login(user)
 		if err != nil {
 			return nil, err
 		}
 
-		return tokenResponse{token}, nil
+		return tokenRep{token}, nil
 	}
 }
 
-func makeCreateDeviceEndpoint(s manager.Service) endpoint.Endpoint {
+func addClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		cdr := request.(createDeviceRequest)
+		req := request.(addClientReq)
 
-		id, err := s.CreateDevice(cdr.key, cdr.device)
+		id, err := svc.AddClient(req.key, req.client)
 		if err != nil {
 			return nil, err
 		}
 
-		return createDeviceResponse{id}, nil
+		return addClientRep{id}, nil
 	}
 }
 
-func makeDeviceInfoEndpoint(s manager.Service) endpoint.Endpoint {
+func viewClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		dir := request.(deviceInfoRequest)
+		req := request.(viewClientReq)
 
-		device, err := s.DeviceInfo(dir.key, dir.id)
+		client, err := svc.ViewClient(req.key, req.id)
 		if err != nil {
 			return nil, err
 		}
 
-		return deviceInfoResponse{device}, nil
+		return viewClientRep{client}, nil
 	}
 }
 
-func makeRemoveDeviceEndpoint(s manager.Service) endpoint.Endpoint {
+func removeClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		dir := request.(deviceInfoRequest)
+		req := request.(viewClientReq)
 
-		if err := s.RemoveDevice(dir.key, dir.id); err != nil {
+		if err := svc.RemoveClient(req.key, req.id); err != nil {
 			return nil, err
 		}
 
-		return deviceRemovalResponse{}, nil
+		return removeClientRep{}, nil
 	}
 }

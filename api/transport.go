@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/go-zoo/bone"
@@ -18,54 +17,54 @@ func MakeHandler(svc manager.Service) http.Handler {
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
-	registrationHandler := kithttp.NewServer(
-		makeRegistrationEndpoint(svc),
-		decodeCredentialsRequest,
+	registration := kithttp.NewServer(
+		registrationEndpoint(svc),
+		decodeCredentials,
 		encodeResponse,
 		opts...,
 	)
 
-	loginHandler := kithttp.NewServer(
-		makeLoginEndpoint(svc),
-		decodeCredentialsRequest,
+	login := kithttp.NewServer(
+		loginEndpoint(svc),
+		decodeCredentials,
 		encodeResponse,
 		opts...,
 	)
 
-	deviceCreationHandler := kithttp.NewServer(
-		makeCreateDeviceEndpoint(svc),
-		decodeCreateDeviceRequest,
+	addClient := kithttp.NewServer(
+		addClientEndpoint(svc),
+		decodeAddClient,
 		encodeResponse,
 		opts...,
 	)
 
-	deviceInfoHandler := kithttp.NewServer(
-		makeDeviceInfoEndpoint(svc),
-		decodeDeviceInfoRequest,
+	viewClient := kithttp.NewServer(
+		viewClientEndpoint(svc),
+		decodeViewClient,
 		encodeResponse,
 		opts...,
 	)
 
-	removeDeviceHandler := kithttp.NewServer(
-		makeRemoveDeviceEndpoint(svc),
-		decodeDeviceInfoRequest,
+	removeClient := kithttp.NewServer(
+		removeClientEndpoint(svc),
+		decodeViewClient,
 		encodeResponse,
 		opts...,
 	)
 
 	r := bone.New()
 
-	r.Post("/users", registrationHandler)
-	r.Post("/tokens", loginHandler)
-	r.Post("/devices", deviceCreationHandler)
-	r.Get("/devices/:id", deviceInfoHandler)
-	r.Delete("/devices/:id", removeDeviceHandler)
+	r.Post("/users", registration)
+	r.Post("/tokens", login)
+	r.Post("/clients", addClient)
+	r.Get("/clients/:id", viewClient)
+	r.Delete("/clients/:id", removeClient)
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
 
-func decodeCredentialsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
 	var user manager.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		return nil, err
@@ -74,29 +73,27 @@ func decodeCredentialsRequest(_ context.Context, r *http.Request) (interface{}, 
 	return user, nil
 }
 
-func decodeCreateDeviceRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var device manager.Device
-	if err := json.NewDecoder(r.Body).Decode(&device); err != nil {
+func decodeAddClient(_ context.Context, r *http.Request) (interface{}, error) {
+	var client manager.Client
+	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
 		return nil, err
 	}
 
-	cdr := createDeviceRequest{
+	req := addClientReq{
 		key:    r.Header.Get("Authorization"),
-		device: device,
+		client: client,
 	}
 
-	return cdr, nil
+	return req, nil
 }
 
-func decodeDeviceInfoRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	id, _ := strconv.ParseUint(bone.GetValue(r, "id"), 0, 0)
-
-	dir := deviceInfoRequest{
+func decodeViewClient(_ context.Context, r *http.Request) (interface{}, error) {
+	req := viewClientReq{
 		key: r.Header.Get("Authorization"),
-		id:  uint(id),
+		id:  bone.GetValue(r, "id"),
 	}
 
-	return dir, nil
+	return req, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
@@ -121,7 +118,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 
 	switch err {
-	case manager.ErrInvalidCredentials, manager.ErrMalformedDevice:
+	case manager.ErrInvalidCredentials, manager.ErrMalformedClient:
 		w.WriteHeader(http.StatusBadRequest)
 	case manager.ErrUnauthorizedAccess:
 		w.WriteHeader(http.StatusForbidden)

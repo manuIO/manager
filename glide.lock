@@ -1,5 +1,5 @@
-hash: 7531640a36fc2dfa43809fcf5760ee2086f47b3e3059b15737226df1b5520cee
-updated: 2017-06-30T17:46:23.282543014+02:00
+hash: a4d1a28aa7b76838a434cf23f1677c9219022e96304a58f0812217b07b9aad85
+updated: 2017-07-22T13:48:59.692125632+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -22,20 +22,22 @@ imports:
   version: 7a2f19628aabfe68f0766b59e74d6315f8347d22
 - name: github.com/go-zoo/bone
   version: fd0aebc74e908868b09ac140fb5a53cb363884c1
+- name: github.com/gocql/gocql
+  version: 88748c7b290d13b288055f5dea4d1c49d44db06d
+  subpackages:
+  - internal/lru
+  - internal/murmur
+  - internal/streams
 - name: github.com/golang/protobuf
-  version: 6a1fa9404c0aebf36c879bc50152edcc953910d2
+  version: 0a4f71a498b7c4812f64969510bcb4eca251e33a
   subpackages:
   - proto
-- name: github.com/jinzhu/gorm
-  version: 5174cc5c242a728b435ea2be8a2f7f998e15429b
-- name: github.com/jinzhu/inflection
-  version: 1c35d901db3da928c72a72d8458480cc9ade058f
+- name: github.com/golang/snappy
+  version: 553a641470496b2327abcac10b36396bd98e45c9
+- name: github.com/hailocab/go-hostpool
+  version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
-- name: github.com/lib/pq
-  version: 8837942c3e09574accbc5f150e2c5e057189cace
-  subpackages:
-  - oid
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
@@ -50,25 +52,27 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 0866df4b85a18d652b6965be022d007cdf076822
+  version: 3e6a7635bac6573d43f49f97b47eb9bda195dba8
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 822d4a1f8edcbcbc71e8d1fd6527b12331a6d0ad
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
   subpackages:
   - xfs
 - name: golang.org/x/crypto
-  version: 5ef0053f77724838734b6945dd364d3847e5de1d
+  version: 14f9af67c679edd414f72f13d67c917447113df2
   subpackages:
   - bcrypt
   - blowfish
 - name: golang.org/x/net
-  version: 1f9224279e98554b6a6432d4dd998a739f8b2b7c
+  version: ab5485076ff3407ad2d02db054635913f017b0ed
   subpackages:
   - context
   - context/ctxhttp
+- name: gopkg.in/inf.v0
+  version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 testImports:
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9

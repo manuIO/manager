@@ -10,10 +10,10 @@ import (
 
 var (
 	users   manager.UserRepository   = mocks.NewUserRepository()
-	devices manager.DeviceRepository = mocks.NewDeviceRepository()
+	clients manager.ClientRepository = mocks.NewClientRepository()
 	hasher  manager.Hasher           = mocks.NewHasher()
 	idp     manager.IdentityProvider = mocks.NewIdentityProvider()
-	svc     manager.Service          = manager.NewService(users, devices, hasher, idp)
+	svc     manager.Service          = manager.NewService(users, clients, hasher, idp)
 )
 
 func TestRegister(t *testing.T) {
@@ -52,59 +52,59 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func TestCreateDevice(t *testing.T) {
+func TestAddClient(t *testing.T) {
 	var cases = []struct {
 		key    string
-		device manager.Device
-		id     uint
+		client manager.Client
+		id     string
 		err    error
 	}{
-		{"foo@bar.com", manager.Device{Name: "a"}, 1, nil},
-		{"foo@bar.com", manager.Device{Name: "b"}, 2, nil},
-		{"foo@bar.com", manager.Device{Name: "c"}, 3, nil},
-		{"foo@bar.com", manager.Device{ID: 3, Name: "c"}, 3, nil},
-		{"", manager.Device{Name: "d"}, 0, manager.ErrUnauthorizedAccess},
-		{"foo@bar.com", manager.Device{}, 0, manager.ErrMalformedDevice},
+		{"foo@bar.com", manager.Client{Name: "a"}, "1", nil},
+		{"foo@bar.com", manager.Client{Name: "b"}, "2", nil},
+		{"foo@bar.com", manager.Client{Name: "c"}, "3", nil},
+		{"foo@bar.com", manager.Client{ID: "3", Name: "c"}, "3", nil},
+		{"", manager.Client{Name: "d"}, "", manager.ErrUnauthorizedAccess},
+		{"foo@bar.com", manager.Client{}, "", manager.ErrMalformedClient},
 	}
 
 	for _, tc := range cases {
-		id, err := svc.CreateDevice(tc.key, tc.device)
+		id, err := svc.AddClient(tc.key, tc.client)
 		assert.Equal(t, tc.id, id, "unexpected id retrieved")
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }
 
-func TestDeviceInfo(t *testing.T) {
+func TestViewClient(t *testing.T) {
 	var cases = []struct {
-		id  uint
+		id  string
 		key string
 		err error
 	}{
-		{1, "foo@bar.com", nil},
-		{1, "", manager.ErrUnauthorizedAccess},
-		{5, "foo@bar.com", manager.ErrNotFound},
+		{"1", "foo@bar.com", nil},
+		{"1", "", manager.ErrUnauthorizedAccess},
+		{"5", "foo@bar.com", manager.ErrNotFound},
 	}
 
 	for _, tc := range cases {
-		_, err := svc.DeviceInfo(tc.key, tc.id)
+		_, err := svc.ViewClient(tc.key, tc.id)
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }
 
-func TestRemoveDevice(t *testing.T) {
+func TestRemoveClient(t *testing.T) {
 	var cases = []struct {
-		id  uint
+		id  string
 		key string
 		err error
 	}{
-		{1, "", manager.ErrUnauthorizedAccess},
-		{1, "foo@bar.com", nil},
-		{1, "foo@bar.com", nil},
-		{2, "foo@bar.com", nil},
+		{"1", "", manager.ErrUnauthorizedAccess},
+		{"1", "foo@bar.com", nil},
+		{"1", "foo@bar.com", nil},
+		{"2", "foo@bar.com", nil},
 	}
 
 	for _, tc := range cases {
-		err := svc.RemoveDevice(tc.key, tc.id)
+		err := svc.RemoveClient(tc.key, tc.id)
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }

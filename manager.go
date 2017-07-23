@@ -4,16 +4,16 @@ var _ Service = (*managerService)(nil)
 
 type managerService struct {
 	users   UserRepository
-	devices DeviceRepository
+	clients ClientRepository
 	hasher  Hasher
 	idp     IdentityProvider
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(ur UserRepository, dr DeviceRepository, hasher Hasher, idp IdentityProvider) Service {
+func NewService(ur UserRepository, cr ClientRepository, hasher Hasher, idp IdentityProvider) Service {
 	return &managerService{
 		users:   ur,
-		devices: dr,
+		clients: cr,
 		hasher:  hasher,
 		idp:     idp,
 	}
@@ -34,7 +34,7 @@ func (ms *managerService) Register(user User) error {
 }
 
 func (ms *managerService) Login(user User) (string, error) {
-	dbUser, err := ms.users.Get(user.Email)
+	dbUser, err := ms.users.One(user.Email)
 	if err != nil {
 		return "", ErrInvalidCredentials
 	}
@@ -46,36 +46,36 @@ func (ms *managerService) Login(user User) (string, error) {
 	return ms.idp.TemporaryKey(user.Email)
 }
 
-func (ms *managerService) CreateDevice(key string, device Device) (uint, error) {
-	if err := device.validate(); err != nil {
-		return 0, err
+func (ms *managerService) AddClient(key string, client Client) (string, error) {
+	if err := client.validate(); err != nil {
+		return "", err
 	}
 
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	device.Owner = sub
-	device.Key, _ = ms.idp.PermanentKey(sub)
+	client.Owner = sub
+	client.Key, _ = ms.idp.PermanentKey(sub)
 
-	return ms.devices.Save(device)
+	return ms.clients.Save(client)
 }
 
-func (ms *managerService) DeviceInfo(key string, id uint) (Device, error) {
+func (ms *managerService) ViewClient(key string, id string) (Client, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
-		return Device{}, err
+		return Client{}, err
 	}
 
-	return ms.devices.One(sub, id)
+	return ms.clients.One(sub, id)
 }
 
-func (ms *managerService) RemoveDevice(key string, id uint) error {
+func (ms *managerService) RemoveClient(key string, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
-	return ms.devices.Remove(sub, id)
+	return ms.clients.Remove(sub, id)
 }

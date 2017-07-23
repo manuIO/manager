@@ -15,77 +15,76 @@ type apiResponse interface {
 	empty() bool
 }
 
-type tokenResponse struct {
+type tokenRep struct {
 	Token string `json:"token,omitempty"`
 }
 
-func (tr tokenResponse) code() int {
+func (rep tokenRep) code() int {
 	return http.StatusCreated
 }
 
-func (tr tokenResponse) headers() map[string]string {
+func (rep tokenRep) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (tr tokenResponse) empty() bool {
-	return tr.Token == ""
+func (rep tokenRep) empty() bool {
+	return rep.Token == ""
 }
 
-type createDeviceRequest struct {
-	device manager.Device
+type addClientReq struct {
+	client manager.Client
 	key    string
 }
 
-type createDeviceResponse struct {
-	id uint
+type addClientRep struct {
+	id string
 }
 
-func (cdr createDeviceResponse) code() int {
+func (rep addClientRep) code() int {
 	return http.StatusCreated
 }
 
-func (cdr createDeviceResponse) headers() map[string]string {
+func (rep addClientRep) headers() map[string]string {
 	return map[string]string{
-		"Location": fmt.Sprintf("/devices/%d", cdr.id),
+		"Location": fmt.Sprint("/clients/", rep.id),
 	}
 }
 
-func (cdr createDeviceResponse) empty() bool {
+func (rep addClientRep) empty() bool {
 	return true
 }
 
-type deviceInfoRequest struct {
-	id  uint
+type viewClientReq struct {
+	id  string
 	key string
 }
 
-type deviceInfoResponse struct {
-	manager.Device
+type viewClientRep struct {
+	manager.Client
 }
 
-func (dir deviceInfoResponse) code() int {
+func (rep viewClientRep) code() int {
 	return http.StatusOK
 }
 
-func (dir deviceInfoResponse) headers() map[string]string {
+func (rep viewClientRep) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (dir deviceInfoResponse) empty() bool {
+func (rep viewClientRep) empty() bool {
 	return false
 }
 
-type deviceRemovalResponse struct {
-}
+type removeClientRep struct{}
 
-func (drr deviceRemovalResponse) code() int {
+func (rep removeClientRep) code() int {
 	return http.StatusNoContent
 }
 
-func (drr deviceRemovalResponse) headers() map[string]string {
+func (rep removeClientRep) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (drr deviceRemovalResponse) empty() bool {
+func (rep removeClientRep) empty() bool {
 	return true
 }
