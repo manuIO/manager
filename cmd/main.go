@@ -54,6 +54,11 @@ func main() {
 	}
 	defer session.Close()
 
+	if err := cassandra.Initialize(session); err != nil {
+		logger.Log("error", err)
+		os.Exit(1)
+	}
+
 	users := cassandra.NewUserRepository(session)
 	clients := cassandra.NewClientRepository(session)
 	hasher := bcrypt.NewHasher()
