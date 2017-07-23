@@ -62,6 +62,6 @@ func removeClientEndpoint(svc manager.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return viewClientRep{}, nil
+		return removeClientRep{}, nil
 	}
 }

@@ -50,6 +50,7 @@ func main() {
 
 	session, err := cassandra.Connect(strings.Split(cfg.Cluster, sep), cfg.Keyspace)
 	if err != nil {
+		logger.Log("error", err)
 		os.Exit(1)
 	}
 	defer session.Close()

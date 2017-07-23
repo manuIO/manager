@@ -49,7 +49,6 @@ func (ls *loggingService) AddClient(key string, client manager.Client) (id strin
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "add_client",
-			"owner", client.Owner,
 			"id", id,
 			"took", time.Since(begin),
 			"error", err,
@@ -63,7 +62,6 @@ func (ls *loggingService) ViewClient(key string, id string) (client manager.Clie
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "view_client",
-			"owner", client.Owner,
 			"id", id,
 			"took", time.Since(begin),
 			"error", err,
