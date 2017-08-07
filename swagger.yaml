@@ -30,7 +30,7 @@ paths:
           description: |
             Failed due to malformed JSON or using an existing email address.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
   /tokens:
     post:
       summary: User authentication
@@ -54,7 +54,7 @@ paths:
           description: |
             Failed due to malformed JSON or using an invalid credentials.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
   /clients:
     post:
       summary: Adds new client
@@ -64,11 +64,7 @@ paths:
       tags:
         - clients
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
+        - $ref: "#/parameters/Authorization"
         - name: client
           description: JSON-formatted document describing the new client.
           in: body
@@ -87,7 +83,7 @@ paths:
         403:
           description: Missing or invalid access token provided.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
     get:
       summary: Retrieves managed clients
       description: |
@@ -98,23 +94,9 @@ paths:
       tags:
         - clients
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: subset_size
-          description: Size of the subset to retrieve.
-          in: query
-          type: integer
-          default: 10
-          required: false
-        - name: subset_idx
-          description: One-based index of the subset to retrieve.
-          in: query
-          type: integer
-          default: 1
-          required: false
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Size"
+        - $ref: "#/parameters/Offset"
       responses:
         200:
           description: Data retrieved.
@@ -131,24 +113,15 @@ paths:
         403:
           description: Missing or invalid access token provided.
         500:
-          description: Unexpected server-side error occured.
-  /clients/{clientId}:
+          $ref: "#/responses/ServiceError"
+  /clients/{id}:
     get:
       summary: Retrieves client info
       tags:
         - clients
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: clientId
-          description: Unique client identifier.
-          in: path
-          type: string
-          format: uuid
-          required: true
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
       responses:
         200:
           description: Data retrieved.
@@ -159,7 +132,7 @@ paths:
         404:
           description: Client does not exist.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
     put:
       summary: Updates client info
       description: |
@@ -169,17 +142,8 @@ paths:
       tags:
         - clients
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: clientId
-          description: Unique client identifier.
-          in: path
-          type: string
-          format: uuid
-          required: true
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
         - name: client
           description: JSON-formatted document describing the updated client.
           in: body
@@ -196,7 +160,7 @@ paths:
         404:
           description: Client does not exist.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
     delete:
       summary: Removes a client
       description: |
@@ -205,23 +169,15 @@ paths:
       tags:
         - clients
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: clientId
-          description: Unique client identifier.
-          in: path
-          type: integer
-          required: true
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
       responses:
         204:
           description: Client removed.
         403:
           description: Missing or invalid access token provided.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
   /channels:
     post:
       summary: Creates new channel
@@ -231,11 +187,7 @@ paths:
       tags:
         - channels
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
+        - $ref: "#/parameters/Authorization"
         - name: channel
           description: JSON-formatted document describing the new channel.
           in: body
@@ -254,7 +206,7 @@ paths:
         403:
           description: Missing or invalid access token provided.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
     get:
       summary: Retrieves managed channels
       description: |
@@ -265,23 +217,9 @@ paths:
       tags:
         - channels
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: subset_size
-          description: Size of the subset to retrieve.
-          in: query
-          type: integer
-          default: 10
-          required: false
-        - name: subset_idx
-          description: One-based index of the subset to retrieve.
-          in: query
-          type: integer
-          default: 1
-          required: false
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Size"
+        - $ref: "#/parameters/Offset"
       responses:
         200:
           description: Data retrieved.
@@ -298,23 +236,15 @@ paths:
         403:
           description: Missing or invalid access token provided.
         500:
-          description: Unexpected server-side error occured.
-  /channels/{chanId}:
+          $ref: "#/responses/ServiceError"
+  /channels/{id}:
     get:
       summary: Retrieves channel info
       tags:
         - channels
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: chanId
-          description: Unique channel identifier.
-          in: path
-          type: integer
-          required: true
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
       responses:
         200:
           description: Data retrieved.
@@ -325,7 +255,7 @@ paths:
         404:
           description: Channel does not exist.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
     put:
       summary: Updates channel info
       description: |
@@ -335,16 +265,8 @@ paths:
       tags:
         - channels
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: chanId
-          description: Unique device identifier
-          in: path
-          type: integer
-          required: true
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
         - name: channel
           description: JSON-formatted document describing the updated channel.
           in: body
@@ -361,7 +283,7 @@ paths:
         404:
           description: Channel does not exist.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
     delete:
       summary: Removes a channel
       description: |
@@ -370,23 +292,85 @@ paths:
       tags:
         - channels
       parameters:
-        - name: Authorization
-          description: User's access token.
-          in: header
-          type: string
-          required: true
-        - name: chanId
-          description: Unique channel identifier.
-          in: path
-          type: integer
-          required: true
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
       responses:
         204:
           description: Channel removed.
         403:
           description: Missing or invalid access token provided.
         500:
-          description: Unexpected server-side error occured.
+          $ref: "#/responses/ServiceError"
+  /channels/{id}/messages:
+    get:
+      summary: Checks whether a message can be read
+      description: |
+        Performs permission check on read request(s) redirected from message
+        reader service. Based on the response, the reader should either respond
+        with stored messages, or reject the request.
+      tags:
+        - messaging
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
+      responses:
+        200:
+          description: Message can be read from the channel.
+        403:
+          description: Message cannot be read from the channel.
+        500:
+          $ref: "#/responses/ServiceError"
+    post:
+      summary: Checks whether a message can be written
+      description: |
+        Performs permission check on write request(s) redirected from protocol
+        adapter(s). Based on the response, the adapter should either emit the
+        event, or reject the request.
+      tags:
+        - messaging
+      parameters:
+        - $ref: "#/parameters/Authorization"
+        - $ref: "#/parameters/Id"
+      responses:
+        200:
+          description: Message can be written to the channel.
+        403:
+          description: Message cannot be written to the channel.
+        500:
+          $ref: "#/responses/ServiceError"
+
+parameters:
+  Authorization:
+    name: Authorization
+    description: User's access token.
+    in: header
+    type: string
+    required: true
+  Id:
+    name: id
+    description: Unique resource identifier.
+    in: path
+    type: string
+    format: uuid
+    required: true
+  Size:
+    name: size
+    description: Size of the subset to retrieve.
+    in: query
+    type: integer
+    default: 10
+    required: false
+  Offset:
+    name: offset
+    description: Number of items to skip during retrieval.
+    in: query
+    type: integer
+    default: 0
+    required: false
+
+responses:
+  ServiceError:
+    description: Unexpected server-side error occured.
 
 definitions:
   ChannelList:
