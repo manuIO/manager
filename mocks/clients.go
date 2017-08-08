@@ -3,6 +3,7 @@ package mocks
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/mainflux/manager"
@@ -52,8 +53,18 @@ func (cr *clientRepositoryMock) One(owner string, id string) (manager.Client, er
 	return manager.Client{}, manager.ErrNotFound
 }
 
-func key(client manager.Client) string {
-	return fmt.Sprintf("%s-%s", client.Owner, client.ID)
+func (cr *clientRepositoryMock) All(owner string) []manager.Client {
+	prefix := fmt.Sprintf("%s-", owner)
+
+	clients := make([]manager.Client, 0)
+
+	for k, v := range cr.clients {
+		if strings.HasPrefix(prefix, k) {
+			clients = append(clients, v)
+		}
+	}
+
+	return clients
 }
 
 func (cr *clientRepositoryMock) Remove(owner string, id string) error {
@@ -65,4 +76,8 @@ func (cr *clientRepositoryMock) Remove(owner string, id string) error {
 	delete(cr.clients, key(client))
 
 	return nil
+}
+
+func key(client manager.Client) string {
+	return fmt.Sprintf("%s-%s", client.Owner, client.ID)
 }

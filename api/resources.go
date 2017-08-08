@@ -15,76 +15,101 @@ type apiResponse interface {
 	empty() bool
 }
 
-type tokenRep struct {
+type addClientReq struct {
+	key    string
+	client manager.Client
+}
+
+type viewResourceReq struct {
+	key string
+	id  string
+}
+
+type listResourcesReq struct {
+	key    string
+	size   int
+	offset int
+}
+
+type tokenRes struct {
 	Token string `json:"token,omitempty"`
 }
 
-func (rep tokenRep) code() int {
+func (res tokenRes) code() int {
 	return http.StatusCreated
 }
 
-func (rep tokenRep) headers() map[string]string {
+func (res tokenRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (rep tokenRep) empty() bool {
-	return rep.Token == ""
+func (res tokenRes) empty() bool {
+	return res.Token == ""
 }
 
-type addClientReq struct {
-	client manager.Client
-	key    string
-}
-
-type addClientRep struct {
+type addClientRes struct {
 	id string
 }
 
-func (rep addClientRep) code() int {
+func (res addClientRes) code() int {
 	return http.StatusCreated
 }
 
-func (rep addClientRep) headers() map[string]string {
+func (res addClientRes) headers() map[string]string {
 	return map[string]string{
-		"Location": fmt.Sprint("/clients/", rep.id),
+		"Location": fmt.Sprint("/clients/", res.id),
 	}
 }
 
-func (rep addClientRep) empty() bool {
+func (res addClientRes) empty() bool {
 	return true
 }
 
-type viewClientReq struct {
-	id  string
-	key string
-}
-
-type viewClientRep struct {
+type viewClientRes struct {
 	manager.Client
 }
 
-func (rep viewClientRep) code() int {
+func (res viewClientRes) code() int {
 	return http.StatusOK
 }
 
-func (rep viewClientRep) headers() map[string]string {
+func (res viewClientRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (rep viewClientRep) empty() bool {
+func (res viewClientRes) empty() bool {
 	return false
 }
 
-type removeClientRep struct{}
+type listClientsRes struct {
+	Clients []manager.Client `json:"clients"`
+	count   int
+}
 
-func (rep removeClientRep) code() int {
+func (res listClientsRes) code() int {
+	return http.StatusOK
+}
+
+func (res listClientsRes) headers() map[string]string {
+	return map[string]string{
+		"X-Count": fmt.Sprintf("%d", res.count),
+	}
+}
+
+func (res listClientsRes) empty() bool {
+	return false
+}
+
+type removeClientRes struct{}
+
+func (res removeClientRes) code() int {
 	return http.StatusNoContent
 }
 
-func (rep removeClientRep) headers() map[string]string {
+func (res removeClientRes) headers() map[string]string {
 	return map[string]string{}
 }
 
-func (rep removeClientRep) empty() bool {
+func (res removeClientRes) empty() bool {
 	return true
 }

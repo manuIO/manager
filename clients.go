@@ -1,5 +1,7 @@
 package manager
 
+import "strings"
+
 // Client represents a Mainflux client. Each client is owned by one user, and
 // it is assigned with the unique identifier and (temporary) access key.
 type Client struct {
@@ -12,8 +14,19 @@ type Client struct {
 	Meta        map[string]string `json:"meta"`
 }
 
+const nameLength int = 50
+
+var clientTypes map[string]bool = map[string]bool{
+	"app":    true,
+	"device": true,
+}
+
 func (c *Client) validate() error {
-	if c.Name == "" || len(c.Name) > 50 {
+	if c.Name == "" || len(c.Name) > nameLength {
+		return ErrMalformedClient
+	}
+
+	if c.Type = strings.ToLower(c.Type); !clientTypes[c.Type] {
 		return ErrMalformedClient
 	}
 
@@ -30,6 +43,9 @@ type ClientRepository interface {
 	// One retrieves the client having the provided identifier, that is owned
 	// by the specified user.
 	One(string, string) (Client, error)
+
+	// All retrieves the clients owned by the specified user.
+	All(string) []Client
 
 	// Remove removes the client having the provided identifier, that is owned
 	// by the specified user.

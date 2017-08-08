@@ -71,6 +71,19 @@ func (ls *loggingService) ViewClient(key string, id string) (client manager.Clie
 	return ls.Service.ViewClient(key, id)
 }
 
+func (ls *loggingService) ListClients(key string) (clients []manager.Client, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "list_clients",
+			"key", key,
+			"took", time.Since(begin),
+			"error", err,
+		)
+	}(time.Now())
+
+	return ls.Service.ListClients(key)
+}
+
 func (ls *loggingService) RemoveClient(key string, id string) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(

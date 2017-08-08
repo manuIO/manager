@@ -71,6 +71,15 @@ func (ms *managerService) ViewClient(key string, id string) (Client, error) {
 	return ms.clients.One(sub, id)
 }
 
+func (ms *managerService) ListClients(key string) ([]Client, error) {
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return ms.clients.All(sub), nil
+}
+
 func (ms *managerService) RemoveClient(key string, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {

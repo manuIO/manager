@@ -61,6 +61,15 @@ func (ms *metricService) ViewClient(key string, id string) (manager.Client, erro
 	return ms.Service.ViewClient(key, id)
 }
 
+func (ms *metricService) ListClients(key string) ([]manager.Client, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "list_clients").Add(1)
+		ms.latency.With("method", "list_clients").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.ListClients(key)
+}
+
 func (ms *metricService) RemoveClient(key string, id string) error {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "remove_client").Add(1)

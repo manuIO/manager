@@ -40,6 +40,10 @@ type Service interface {
 	// ID, that belongs to the user identified by the provided key.
 	ViewClient(string, string) (Client, error)
 
+	// ListClients retrieves data about all clients that belong to the user
+	// identifier by the provided key.
+	ListClients(string) ([]Client, error)
+
 	// RemoveClient removes client identified with the provided ID, that
 	// belongs to the user identified by the provided key.
 	RemoveClient(string, string) error

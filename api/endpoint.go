@@ -11,7 +11,7 @@ func registrationEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		user := request.(manager.User)
 		err := svc.Register(user)
-		return tokenRep{}, err
+		return tokenRes{}, err
 	}
 }
 
@@ -24,7 +24,7 @@ func loginEndpoint(svc manager.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return tokenRep{token}, nil
+		return tokenRes{token}, nil
 	}
 }
 
@@ -37,31 +37,44 @@ func addClientEndpoint(svc manager.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return addClientRep{id}, nil
+		return addClientRes{id}, nil
 	}
 }
 
 func viewClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewClientReq)
+		req := request.(viewResourceReq)
 
 		client, err := svc.ViewClient(req.key, req.id)
 		if err != nil {
 			return nil, err
 		}
 
-		return viewClientRep{client}, nil
+		return viewClientRes{client}, nil
+	}
+}
+
+func listClientsEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(listResourcesReq)
+
+		clients, err := svc.ListClients(req.key)
+		if err != nil {
+			return nil, err
+		}
+
+		return listClientsRes{clients, len(clients)}, nil
 	}
 }
 
 func removeClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(viewClientReq)
+		req := request.(viewResourceReq)
 
 		if err := svc.RemoveClient(req.key, req.id); err != nil {
 			return nil, err
 		}
 
-		return removeClientRep{}, nil
+		return removeClientRes{}, nil
 	}
 }

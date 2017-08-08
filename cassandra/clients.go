@@ -51,6 +51,38 @@ func (repo *clientRepository) One(owner string, id string) (manager.Client, erro
 	return cli, nil
 }
 
+func (repo *clientRepository) All(owner string) []manager.Client {
+	cql := `SELECT id, type, name, description, access_key, meta FROM clients_by_user WHERE user = ?`
+	var id string
+	var cType string
+	var name string
+	var desc string
+	var key string
+	var meta map[string]string
+
+	// NOTE: the closing might failed
+	iter := repo.session.Query(cql, owner).Iter()
+	defer iter.Close()
+
+	var clients []manager.Client
+
+	for iter.Scan(&id, &cType, &name, &desc, &key, &meta) {
+		c := manager.Client{
+			Owner:       owner,
+			ID:          id,
+			Type:        cType,
+			Name:        name,
+			Description: desc,
+			Key:         key,
+			Meta:        meta,
+		}
+
+		clients = append(clients, c)
+	}
+
+	return clients
+}
+
 func (repo *clientRepository) Remove(owner string, id string) error {
 	cql := `DELETE FROM clients_by_user WHERE user = ? AND id = ?`
 	return repo.session.Query(cql, owner, id).Exec()

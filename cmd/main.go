@@ -22,7 +22,7 @@ import (
 const (
 	port     int    = 8180
 	sep      string = ","
-	cluster  string = "0.0.0.0"
+	cluster  string = "127.0.0.1"
 	keyspace string = "manager"
 	secret   string = "token-secret"
 )

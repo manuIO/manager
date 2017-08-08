@@ -17,48 +17,50 @@ func MakeHandler(svc manager.Service) http.Handler {
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
-	registration := kithttp.NewServer(
+	r := bone.New()
+
+	r.Post("/users", kithttp.NewServer(
 		registrationEndpoint(svc),
 		decodeCredentials,
 		encodeResponse,
 		opts...,
-	)
+	))
 
-	login := kithttp.NewServer(
+	r.Post("/tokens", kithttp.NewServer(
 		loginEndpoint(svc),
 		decodeCredentials,
 		encodeResponse,
 		opts...,
-	)
+	))
 
-	addClient := kithttp.NewServer(
+	r.Post("/clients", kithttp.NewServer(
 		addClientEndpoint(svc),
 		decodeAddClient,
 		encodeResponse,
 		opts...,
-	)
+	))
 
-	viewClient := kithttp.NewServer(
+	r.Get("/clients/:id", kithttp.NewServer(
 		viewClientEndpoint(svc),
-		decodeViewClient,
+		decodeView,
 		encodeResponse,
 		opts...,
-	)
+	))
 
-	removeClient := kithttp.NewServer(
+	r.Get("/clients", kithttp.NewServer(
+		listClientsEndpoint(svc),
+		decodeList,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Delete("/clients/:id", kithttp.NewServer(
 		removeClientEndpoint(svc),
-		decodeViewClient,
+		decodeView,
 		encodeResponse,
 		opts...,
-	)
+	))
 
-	r := bone.New()
-
-	r.Post("/users", registration)
-	r.Post("/tokens", login)
-	r.Post("/clients", addClient)
-	r.Get("/clients/:id", viewClient)
-	r.Delete("/clients/:id", removeClient)
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
@@ -87,10 +89,20 @@ func decodeAddClient(_ context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
-func decodeViewClient(_ context.Context, r *http.Request) (interface{}, error) {
-	req := viewClientReq{
+func decodeView(_ context.Context, r *http.Request) (interface{}, error) {
+	req := viewResourceReq{
 		key: r.Header.Get("Authorization"),
 		id:  bone.GetValue(r, "id"),
+	}
+
+	return req, nil
+}
+
+func decodeList(_ context.Context, r *http.Request) (interface{}, error) {
+	req := listResourcesReq{
+		key:    r.Header.Get("Authorization"),
+		size:   0,
+		offset: 0,
 	}
 
 	return req, nil
