@@ -5,7 +5,7 @@ package manager
 type Channel struct {
 	Owner     string   `json:"-"`
 	ID        string   `json:"id"`
-	Name      string   `json:"name"`
+	Name      string   `json:"name,omitempty"`
 	Connected []string `json:"connected"`
 }
 

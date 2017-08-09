@@ -8,9 +8,9 @@ type Client struct {
 	Owner string            `json:"-"`
 	ID    string            `json:"id"`
 	Type  string            `json:"type"`
-	Name  string            `json:"name"`
+	Name  string            `json:"name,omitempty"`
 	Key   string            `json:"key"`
-	Meta  map[string]string `json:"meta"`
+	Meta  map[string]string `json:"meta,omitempty"`
 }
 
 var clientTypes map[string]bool = map[string]bool{
