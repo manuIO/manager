@@ -21,6 +21,12 @@ type clientReq struct {
 	client manager.Client
 }
 
+type channelReq struct {
+	key     string
+	id      string
+	channel manager.Channel
+}
+
 type viewResourceReq struct {
 	key string
 	id  string
@@ -121,5 +127,32 @@ func (res removeClientRes) headers() map[string]string {
 }
 
 func (res removeClientRes) empty() bool {
+	return true
+}
+
+type channelRes struct {
+	id      string
+	created bool
+}
+
+func (res channelRes) code() int {
+	if res.created {
+		return http.StatusCreated
+	}
+
+	return http.StatusOK
+}
+
+func (res channelRes) headers() map[string]string {
+	if res.created {
+		return map[string]string{
+			"Location": fmt.Sprint("/channels/", res.id),
+		}
+	}
+
+	return map[string]string{}
+}
+
+func (res channelRes) empty() bool {
 	return true
 }

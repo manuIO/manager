@@ -68,6 +68,13 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	))
 
+	r.Post("/channels", kithttp.NewServer(
+		createChannelEndpoint(svc),
+		decodeChannel,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
@@ -92,6 +99,21 @@ func decodeClient(_ context.Context, r *http.Request) (interface{}, error) {
 		key:    r.Header.Get("Authorization"),
 		id:     bone.GetValue(r, "id"),
 		client: client,
+	}
+
+	return req, nil
+}
+
+func decodeChannel(_ context.Context, r *http.Request) (interface{}, error) {
+	var channel manager.Channel
+	if err := json.NewDecoder(r.Body).Decode(&channel); err != nil {
+		return nil, err
+	}
+
+	req := channelReq{
+		key:     r.Header.Get("Authorization"),
+		id:      bone.GetValue(r, "id"),
+		channel: channel,
 	}
 
 	return req, nil

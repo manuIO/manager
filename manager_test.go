@@ -141,3 +141,22 @@ func TestRemoveClient(t *testing.T) {
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }
+
+func TestCreateChannel(t *testing.T) {
+	var cases = []struct {
+		key     string
+		channel manager.Channel
+		id      string
+		err     error
+	}{
+		{"foo@bar.com", manager.Channel{Connected: []string{"1", "2"}}, "1", nil},
+		{"foo@bar.com", manager.Channel{Connected: []string{"2"}}, "2", nil},
+		{"", manager.Channel{Connected: []string{"1"}}, "", manager.ErrUnauthorizedAccess},
+	}
+
+	for _, tc := range cases {
+		id, err := svc.CreateChannel(tc.key, tc.channel)
+		assert.Equal(t, tc.id, id, "unexpected id retrieved")
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}

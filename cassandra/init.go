@@ -21,7 +21,8 @@ var tables []string = []string{
 	`CREATE TABLE IF NOT EXISTS channels_by_user (
 		user text,
 		id timeuuid,
-		clients set<text>,
+		name text,
+		connected set<text>,
 		PRIMARY KEY ((user), id)
 	)`,
 }

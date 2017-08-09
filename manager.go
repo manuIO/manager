@@ -108,7 +108,13 @@ func (ms *managerService) RemoveClient(key, id string) error {
 }
 
 func (ms *managerService) CreateChannel(key string, channel Channel) (string, error) {
-	return "", nil
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return "", err
+	}
+
+	channel.Owner = sub
+	return ms.channels.Save(channel)
 }
 
 func (ms *managerService) UpdateChannel(key string, channel Channel) error {

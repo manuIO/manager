@@ -24,50 +24,47 @@ func NewClientRepository() manager.ClientRepository {
 	}
 }
 
-func (cr *clientRepositoryMock) Save(client manager.Client) (string, error) {
-	cr.mu.Lock()
-	defer cr.mu.Unlock()
+func (repo *clientRepositoryMock) Save(client manager.Client) (string, error) {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
 
-	cr.counter += 1
-	client.ID = strconv.Itoa(cr.counter)
+	repo.counter += 1
+	client.ID = strconv.Itoa(repo.counter)
 
-	cr.clients[key(client)] = client
+	repo.clients[key(client.Owner, client.ID)] = client
 
 	return client.ID, nil
 }
 
-func (cr *clientRepositoryMock) Update(client manager.Client) error {
-	cr.mu.Lock()
-	defer cr.mu.Unlock()
+func (repo *clientRepositoryMock) Update(client manager.Client) error {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
 
-	if _, ok := cr.clients[key(client)]; !ok {
+	dbKey := key(client.Owner, client.ID)
+
+	if _, ok := repo.clients[dbKey]; !ok {
 		return manager.ErrNotFound
 	}
 
-	cr.clients[key(client)] = client
+	repo.clients[dbKey] = client
 
 	return nil
 }
 
-func (cr *clientRepositoryMock) One(owner, id string) (manager.Client, error) {
-	client := manager.Client{
-		ID:    id,
-		Owner: owner,
-	}
-
-	if c, ok := cr.clients[key(client)]; ok {
+func (repo *clientRepositoryMock) One(owner, id string) (manager.Client, error) {
+	if c, ok := repo.clients[key(owner, id)]; ok {
 		return c, nil
 	}
 
 	return manager.Client{}, manager.ErrNotFound
 }
 
-func (cr *clientRepositoryMock) All(owner string) []manager.Client {
+func (repo *clientRepositoryMock) All(owner string) []manager.Client {
 	prefix := fmt.Sprintf("%s-", owner)
 
 	clients := make([]manager.Client, 0)
 
-	for k, v := range cr.clients {
+	for k, v := range repo.clients {
 		if strings.HasPrefix(prefix, k) {
 			clients = append(clients, v)
 		}
@@ -76,17 +73,7 @@ func (cr *clientRepositoryMock) All(owner string) []manager.Client {
 	return clients
 }
 
-func (cr *clientRepositoryMock) Remove(owner, id string) error {
-	client := manager.Client{
-		ID:    id,
-		Owner: owner,
-	}
-
-	delete(cr.clients, key(client))
-
+func (repo *clientRepositoryMock) Remove(owner, id string) error {
+	delete(repo.clients, key(owner, id))
 	return nil
-}
-
-func key(client manager.Client) string {
-	return fmt.Sprintf("%s-%s", client.Owner, client.ID)
 }

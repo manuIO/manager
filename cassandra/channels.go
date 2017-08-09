@@ -17,7 +17,15 @@ func NewChannelRepository(session *gocql.Session) manager.ChannelRepository {
 }
 
 func (repo *channelRepository) Save(channel manager.Channel) (string, error) {
-	return "", nil
+	cql := `INSERT INTO channels_by_user (user, id, name, connected) VALUES (?, ?, ?, ?)`
+	id := gocql.TimeUUID()
+
+	if err := repo.session.Query(cql, channel.Owner, id,
+		channel.Name, channel.Connected).Exec(); err != nil {
+		return "", err
+	}
+
+	return id.String(), nil
 }
 
 func (repo *channelRepository) Update(channel manager.Channel) error {

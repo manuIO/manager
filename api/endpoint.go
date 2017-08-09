@@ -91,3 +91,16 @@ func removeClientEndpoint(svc manager.Service) endpoint.Endpoint {
 		return removeClientRes{}, nil
 	}
 }
+
+func createChannelEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(channelReq)
+
+		id, err := svc.CreateChannel(req.key, req.channel)
+		if err != nil {
+			return nil, err
+		}
+
+		return channelRes{id: id, created: true}, nil
+	}
+}
