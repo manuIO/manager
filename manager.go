@@ -59,6 +59,10 @@ func (ms *managerService) AddClient(key string, client Client) (string, error) {
 		return "", err
 	}
 
+	if _, err := ms.users.One(sub); err != nil {
+		return "", ErrUnauthorizedAccess
+	}
+
 	client.ID = ms.clients.Id()
 	client.Owner = sub
 	client.Key, _ = ms.idp.PermanentKey(client.ID)
@@ -76,6 +80,10 @@ func (ms *managerService) UpdateClient(key string, client Client) error {
 		return err
 	}
 
+	if _, err := ms.users.One(sub); err != nil {
+		return ErrUnauthorizedAccess
+	}
+
 	client.Owner = sub
 
 	return ms.clients.Update(client)
@@ -87,6 +95,10 @@ func (ms *managerService) ViewClient(key, id string) (Client, error) {
 		return Client{}, err
 	}
 
+	if _, err := ms.users.One(sub); err != nil {
+		return Client{}, ErrUnauthorizedAccess
+	}
+
 	return ms.clients.One(sub, id)
 }
 
@@ -94,6 +106,10 @@ func (ms *managerService) ListClients(key string) ([]Client, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return nil, err
+	}
+
+	if _, err := ms.users.One(sub); err != nil {
+		return nil, ErrUnauthorizedAccess
 	}
 
 	return ms.clients.All(sub), nil
@@ -105,6 +121,10 @@ func (ms *managerService) RemoveClient(key, id string) error {
 		return err
 	}
 
+	if _, err := ms.users.One(sub); err != nil {
+		return ErrUnauthorizedAccess
+	}
+
 	return ms.clients.Remove(sub, id)
 }
 
@@ -112,6 +132,10 @@ func (ms *managerService) CreateChannel(key string, channel Channel) (string, er
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return "", err
+	}
+
+	if _, err := ms.users.One(sub); err != nil {
+		return "", ErrUnauthorizedAccess
 	}
 
 	channel.Owner = sub
@@ -124,8 +148,11 @@ func (ms *managerService) UpdateChannel(key string, channel Channel) error {
 		return err
 	}
 
-	channel.Owner = sub
+	if _, err := ms.users.One(sub); err != nil {
+		return ErrUnauthorizedAccess
+	}
 
+	channel.Owner = sub
 	return ms.channels.Update(channel)
 }
 
@@ -133,6 +160,10 @@ func (ms *managerService) ViewChannel(key, id string) (Channel, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return Channel{}, err
+	}
+
+	if _, err := ms.users.One(sub); err != nil {
+		return Channel{}, ErrUnauthorizedAccess
 	}
 
 	return ms.channels.One(sub, id)
@@ -144,6 +175,10 @@ func (ms *managerService) ListChannels(key string) ([]Channel, error) {
 		return nil, err
 	}
 
+	if _, err := ms.users.One(sub); err != nil {
+		return nil, ErrUnauthorizedAccess
+	}
+
 	return ms.channels.All(sub), nil
 }
 
@@ -151,6 +186,10 @@ func (ms *managerService) RemoveChannel(key, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
+	}
+
+	if _, err := ms.users.One(sub); err != nil {
+		return ErrUnauthorizedAccess
 	}
 
 	return ms.channels.Remove(sub, id)
