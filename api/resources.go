@@ -191,3 +191,17 @@ func (res listChannelsRes) headers() map[string]string {
 func (res listChannelsRes) empty() bool {
 	return false
 }
+
+type accessRes struct{}
+
+func (res accessRes) code() int {
+	return http.StatusAccepted
+}
+
+func (res accessRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res accessRes) empty() bool {
+	return true
+}

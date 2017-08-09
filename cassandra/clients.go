@@ -16,18 +16,20 @@ func NewClientRepository(session *gocql.Session) manager.ClientRepository {
 	return &clientRepository{session}
 }
 
-func (repo *clientRepository) Save(client manager.Client) (string, error) {
+func (repo *clientRepository) Id() string {
+	return gocql.TimeUUID().String()
+}
+
+func (repo *clientRepository) Save(client manager.Client) error {
 	cql := `INSERT INTO clients_by_user (user, id, type, name, access_key, meta)
 		VALUES (?, ?, ?, ?, ?, ?)`
 
-	id := gocql.TimeUUID()
-
-	if err := repo.session.Query(cql, client.Owner, id,
+	if err := repo.session.Query(cql, client.Owner, client.ID,
 		client.Type, client.Name, client.Key, client.Meta).Exec(); err != nil {
-		return "", err
+		return err
 	}
 
-	return id.String(), nil
+	return nil
 }
 
 func (repo *clientRepository) Update(client manager.Client) error {
@@ -45,8 +47,8 @@ func (repo *clientRepository) Update(client manager.Client) error {
 }
 
 func (repo *clientRepository) One(owner string, id string) (manager.Client, error) {
-	cql := `SELECT type, name, access_key, meta
-		FROM clients_by_user WHERE user = ? AND id = ? LIMIT 1`
+	cql := `SELECT type, name, access_key, meta FROM clients_by_user
+		WHERE user = ? AND id = ? LIMIT 1`
 
 	cli := manager.Client{
 		Owner: owner,

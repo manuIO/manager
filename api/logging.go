@@ -183,10 +183,10 @@ func (ls *loggingService) RemoveChannel(key string, id string) (err error) {
 	return ls.Service.RemoveChannel(key, id)
 }
 
-func (ls *loggingService) CanRead(key string, id string) (allowed bool) {
+func (ls *loggingService) CanAccess(key string, id string) (allowed bool) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
-			"method", "can_read",
+			"method", "can_access",
 			"key", key,
 			"id", id,
 			"allowed", allowed,
@@ -194,19 +194,5 @@ func (ls *loggingService) CanRead(key string, id string) (allowed bool) {
 		)
 	}(time.Now())
 
-	return ls.Service.CanRead(key, id)
-}
-
-func (ls *loggingService) CanWrite(key string, id string) (allowed bool) {
-	defer func(begin time.Time) {
-		ls.logger.Log(
-			"method", "can_write",
-			"key", key,
-			"id", id,
-			"allowed", allowed,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-
-	return ls.Service.CanWrite(key, id)
+	return ls.Service.CanAccess(key, id)
 }

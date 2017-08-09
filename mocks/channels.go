@@ -64,7 +64,7 @@ func (repo *channelRepositoryMock) All(owner string) []manager.Channel {
 	channels := make([]manager.Channel, 0)
 
 	for k, v := range repo.channels {
-		if strings.HasPrefix(prefix, k) {
+		if strings.HasPrefix(k, prefix) {
 			channels = append(channels, v)
 		}
 	}
@@ -77,11 +77,15 @@ func (repo *channelRepositoryMock) Remove(owner, id string) error {
 	return nil
 }
 
-func (repo *channelRepositoryMock) HasClient(owner, id, client string) bool {
-	if c, ok := repo.channels[key(owner, id)]; ok {
-		for _, v := range c.Connected {
-			if v == client {
-				return true
+func (repo *channelRepositoryMock) HasClient(channel, client string) bool {
+	suffix := fmt.Sprintf("-%s", channel)
+
+	for k, v := range repo.channels {
+		if strings.HasSuffix(k, suffix) {
+			for _, c := range v.Connected {
+				if c == client {
+					return true
+				}
 			}
 		}
 	}

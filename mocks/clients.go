@@ -2,6 +2,7 @@ package mocks
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,16 +25,21 @@ func NewClientRepository() manager.ClientRepository {
 	}
 }
 
-func (repo *clientRepositoryMock) Save(client manager.Client) (string, error) {
+func (repo *clientRepositoryMock) Id() string {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
 	repo.counter += 1
-	client.ID = strconv.Itoa(repo.counter)
+	return strconv.Itoa(repo.counter)
+}
+
+func (repo *clientRepositoryMock) Save(client manager.Client) error {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
 
 	repo.clients[key(client.Owner, client.ID)] = client
 
-	return client.ID, nil
+	return nil
 }
 
 func (repo *clientRepositoryMock) Update(client manager.Client) error {
@@ -46,6 +52,7 @@ func (repo *clientRepositoryMock) Update(client manager.Client) error {
 		return manager.ErrNotFound
 	}
 
+	log.Print("c")
 	repo.clients[dbKey] = client
 
 	return nil
@@ -65,7 +72,7 @@ func (repo *clientRepositoryMock) All(owner string) []manager.Client {
 	clients := make([]manager.Client, 0)
 
 	for k, v := range repo.clients {
-		if strings.HasPrefix(prefix, k) {
+		if strings.HasPrefix(k, prefix) {
 			clients = append(clients, v)
 		}
 	}

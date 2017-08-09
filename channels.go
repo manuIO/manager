@@ -33,5 +33,5 @@ type ChannelRepository interface {
 
 	// HasClient determines whether the client with the provided identifier, is
 	// "connected" to the specified channel.
-	HasClient(string, string, string) bool
+	HasClient(string, string) bool
 }

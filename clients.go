@@ -28,10 +28,12 @@ func (c *Client) validate() error {
 
 // ClientRepository specifies a client persistence API.
 type ClientRepository interface {
-	// Save persists the client. Successful operation is indicated by unique
-	// identifier accompanied by nil error response. A non-nil error is
-	// returned to indicate operation failure.
-	Save(Client) (string, error)
+	// Id generates new resource identifier.
+	Id() string
+
+	// Save persists the client. Successful operation is indicated by non-nil
+	// error response.
+	Save(Client) error
 
 	// Update performs an update to the existing client. A non-nil error is
 	// returned to indicate operation failure.

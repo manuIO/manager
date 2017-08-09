@@ -17,7 +17,8 @@ func NewChannelRepository(session *gocql.Session) manager.ChannelRepository {
 }
 
 func (repo *channelRepository) Save(channel manager.Channel) (string, error) {
-	cql := `INSERT INTO channels_by_user (user, id, name, connected) VALUES (?, ?, ?, ?)`
+	cql := `INSERT INTO channels_by_user (user, id, name, connected)
+		VALUES (?, ?, ?, ?)`
 	id := gocql.TimeUUID()
 
 	if err := repo.session.Query(cql, channel.Owner, id,
@@ -32,18 +33,17 @@ func (repo *channelRepository) Update(channel manager.Channel) error {
 	cql := `UPDATE channels_by_user SET name = ?, connected = ?
 		WHERE user = ? AND id = ? IF EXISTS`
 
-	applied, err := repo.session.Query(cql, channel.Name, channel.Connected,
-		channel.Owner, channel.ID).ScanCAS()
-
-	if !applied {
+	if applied, _ := repo.session.Query(cql, channel.Name, channel.Connected,
+		channel.Owner, channel.ID).ScanCAS(); !applied {
 		return manager.ErrNotFound
 	}
 
-	return err
+	return nil
 }
 
 func (repo *channelRepository) One(owner, id string) (manager.Channel, error) {
-	cql := `SELECT name, connected FROM channels_by_user WHERE user = ? AND id = ? LIMIT 1`
+	cql := `SELECT name, connected FROM channels_by_user
+		WHERE user = ? AND id = ? LIMIT 1`
 
 	ch := manager.Channel{
 		Owner: owner,
@@ -96,6 +96,20 @@ func (repo *channelRepository) Remove(owner, id string) error {
 	return repo.session.Query(cql, owner, id).Exec()
 }
 
-func (repo *channelRepository) HasClient(owned, id, client string) bool {
+func (repo *channelRepository) HasClient(channel, client string) bool {
+	cql := `SELECT connected FROM clients_by_channel WHERE id = ? LIMIT 1`
+
+	var connected []string
+
+	if err := repo.session.Query(cql, channel).Scan(&connected); err != nil {
+		return false
+	}
+
+	for _, v := range connected {
+		if v == client {
+			return true
+		}
+	}
+
 	return false
 }

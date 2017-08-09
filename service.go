@@ -71,13 +71,7 @@ type Service interface {
 	// belongs to the user identified by the provided key.
 	RemoveChannel(string, string) error
 
-	// CanRead determines whether or not messages can be read by the client
-	// identified with the provided key from channel identified by the provided
-	// ID.
-	CanRead(string, string) bool
-
-	// CanWrite determines whether or not message can be written to the channel
-	// identified by the provided ID by the client identified with the provided
-	// key.
-	CanWrite(string, string) bool
+	// CanAccess determines whether or not the channel can be accessed with the
+	// provided key.
+	CanAccess(string, string) bool
 }

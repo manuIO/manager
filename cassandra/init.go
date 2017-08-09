@@ -24,6 +24,11 @@ var tables []string = []string{
 		connected set<text>,
 		PRIMARY KEY ((user), id)
 	)`,
+	`CREATE MATERIALIZED VIEW clients_by_channel AS
+		SELECT user, id, connected FROM channels_by_user
+		WHERE id IS NOT NULL
+		PRIMARY KEY (id, user)
+	`,
 }
 
 // Connect establishes connection to the Cassandra cluster.

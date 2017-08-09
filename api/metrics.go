@@ -133,20 +133,11 @@ func (ms *metricService) RemoveChannel(key string, id string) error {
 	return ms.Service.RemoveChannel(key, id)
 }
 
-func (ms *metricService) CanRead(key string, id string) bool {
+func (ms *metricService) CanAccess(key string, id string) bool {
 	defer func(begin time.Time) {
-		ms.counter.With("method", "can_read").Add(1)
-		ms.latency.With("method", "can_read").Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "can_access").Add(1)
+		ms.latency.With("method", "can_access").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return ms.Service.CanRead(key, id)
-}
-
-func (ms *metricService) CanWrite(key string, id string) bool {
-	defer func(begin time.Time) {
-		ms.counter.With("method", "can_write").Add(1)
-		ms.latency.With("method", "can_write").Observe(time.Since(begin).Seconds())
-	}(time.Now())
-
-	return ms.Service.CanWrite(key, id)
+	return ms.Service.CanAccess(key, id)
 }

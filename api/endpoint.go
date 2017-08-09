@@ -155,3 +155,15 @@ func removeChannelEndpoint(svc manager.Service) endpoint.Endpoint {
 		return removeRes{}, nil
 	}
 }
+
+func canAccessEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(viewResourceReq)
+
+		if allowed := svc.CanAccess(req.key, req.id); !allowed {
+			return nil, manager.ErrUnauthorizedAccess
+		}
+
+		return accessRes{}, nil
+	}
+}

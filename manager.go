@@ -59,10 +59,11 @@ func (ms *managerService) AddClient(key string, client Client) (string, error) {
 		return "", err
 	}
 
+	client.ID = ms.clients.Id()
 	client.Owner = sub
-	client.Key, _ = ms.idp.PermanentKey(sub)
+	client.Key, _ = ms.idp.PermanentKey(client.ID)
 
-	return ms.clients.Save(client)
+	return client.ID, ms.clients.Save(client)
 }
 
 func (ms *managerService) UpdateClient(key string, client Client) error {
@@ -155,10 +156,11 @@ func (ms *managerService) RemoveChannel(key, id string) error {
 	return ms.channels.Remove(sub, id)
 }
 
-func (ms *managerService) CanRead(key, id string) bool {
-	return false
-}
+func (ms *managerService) CanAccess(key, channel string) bool {
+	client, err := ms.idp.Identity(key)
+	if err != nil {
+		return false
+	}
 
-func (ms *managerService) CanWrite(key, id string) bool {
-	return false
+	return ms.channels.HasClient(channel, client)
 }

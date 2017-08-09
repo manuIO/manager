@@ -211,6 +211,23 @@ func TestListChannels(t *testing.T) {
 	}
 }
 
+func TestCanAccess(t *testing.T) {
+	var cases = []struct {
+		client  string
+		channel string
+		allowed bool
+	}{
+		{"1", "1", true},
+		{"1", "2", false},
+		{"", "1", false},
+	}
+
+	for _, tc := range cases {
+		allowed := svc.CanAccess(tc.client, tc.channel)
+		assert.Equal(t, tc.allowed, allowed, "unexpected value occurred")
+	}
+}
+
 func TestRemoveChannel(t *testing.T) {
 	var cases = []struct {
 		id  string

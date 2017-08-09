@@ -103,6 +103,20 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	))
 
+	r.Get("/channels/:id/messages", kithttp.NewServer(
+		canAccessEndpoint(svc),
+		decodeView,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Post("/channels/:id/messages", kithttp.NewServer(
+		canAccessEndpoint(svc),
+		decodeView,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
