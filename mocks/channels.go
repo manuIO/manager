@@ -1,7 +1,9 @@
 package mocks
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/mainflux/manager"
@@ -35,21 +37,54 @@ func (repo *channelRepositoryMock) Save(channel manager.Channel) (string, error)
 }
 
 func (repo *channelRepositoryMock) Update(channel manager.Channel) error {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+
+	dbKey := key(channel.Owner, channel.ID)
+
+	if _, ok := repo.channels[dbKey]; !ok {
+		return manager.ErrNotFound
+	}
+
+	repo.channels[dbKey] = channel
 	return nil
 }
 
 func (repo *channelRepositoryMock) One(owner, id string) (manager.Channel, error) {
-	return manager.Channel{}, nil
+	if c, ok := repo.channels[key(owner, id)]; ok {
+		return c, nil
+	}
+
+	return manager.Channel{}, manager.ErrNotFound
 }
 
 func (repo *channelRepositoryMock) All(owner string) []manager.Channel {
-	return make([]manager.Channel, 0)
+	prefix := fmt.Sprintf("%s-", owner)
+
+	channels := make([]manager.Channel, 0)
+
+	for k, v := range repo.channels {
+		if strings.HasPrefix(prefix, k) {
+			channels = append(channels, v)
+		}
+	}
+
+	return channels
 }
 
 func (repo *channelRepositoryMock) Remove(owner, id string) error {
+	delete(repo.channels, key(owner, id))
 	return nil
 }
 
-func (repo *channelRepositoryMock) HasClient(owned, id, client string) bool {
+func (repo *channelRepositoryMock) HasClient(owner, id, client string) bool {
+	if c, ok := repo.channels[key(owner, id)]; ok {
+		for _, v := range c.Connected {
+			if v == client {
+				return true
+			}
+		}
+	}
+
 	return false
 }

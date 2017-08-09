@@ -118,7 +118,14 @@ func (ms *managerService) CreateChannel(key string, channel Channel) (string, er
 }
 
 func (ms *managerService) UpdateChannel(key string, channel Channel) error {
-	return nil
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return err
+	}
+
+	channel.Owner = sub
+
+	return ms.channels.Update(channel)
 }
 
 func (ms *managerService) ViewChannel(key, id string) (Channel, error) {

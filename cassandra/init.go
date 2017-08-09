@@ -13,7 +13,6 @@ var tables []string = []string{
 		id timeuuid,
 		type text,
 		name text,
-		description text,
 		access_key text,
 		meta map<text, text>,
 		PRIMARY KEY ((user), id)

@@ -160,3 +160,21 @@ func TestCreateChannel(t *testing.T) {
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }
+
+func TestUpdateChannel(t *testing.T) {
+	var cases = []struct {
+		key     string
+		channel manager.Channel
+		err     error
+	}{
+		{"foo@bar.com", manager.Channel{ID: "1", Connected: []string{"1"}}, nil},
+		{"foo@bar.com", manager.Channel{ID: "2", Connected: []string{}}, nil},
+		{"", manager.Channel{ID: "2", Connected: []string{"1"}}, manager.ErrUnauthorizedAccess},
+		{"foo@bar.com", manager.Channel{ID: "3", Connected: []string{"1"}}, manager.ErrNotFound},
+	}
+
+	for _, tc := range cases {
+		err := svc.UpdateChannel(tc.key, tc.channel)
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}

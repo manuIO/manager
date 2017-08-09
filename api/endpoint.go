@@ -104,3 +104,16 @@ func createChannelEndpoint(svc manager.Service) endpoint.Endpoint {
 		return channelRes{id: id, created: true}, nil
 	}
 }
+
+func updateChannelEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(channelReq)
+		req.channel.ID = req.id
+
+		if err := svc.UpdateChannel(req.key, req.channel); err != nil {
+			return nil, err
+		}
+
+		return channelRes{id: req.id, created: false}, nil
+	}
+}

@@ -29,7 +29,17 @@ func (repo *channelRepository) Save(channel manager.Channel) (string, error) {
 }
 
 func (repo *channelRepository) Update(channel manager.Channel) error {
-	return nil
+	cql := `UPDATE channels_by_user SET name = ?, connected = ?
+		WHERE user = ? AND id = ? IF EXISTS`
+
+	applied, err := repo.session.Query(cql, channel.Name, channel.Connected,
+		channel.Owner, channel.ID).ScanCAS()
+
+	if !applied {
+		return manager.ErrNotFound
+	}
+
+	return err
 }
 
 func (repo *channelRepository) One(owner, id string) (manager.Channel, error) {

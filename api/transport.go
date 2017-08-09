@@ -75,6 +75,13 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	))
 
+	r.Put("/channels/:id", kithttp.NewServer(
+		updateChannelEndpoint(svc),
+		decodeChannel,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r

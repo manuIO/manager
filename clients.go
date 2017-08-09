@@ -5,16 +5,13 @@ import "strings"
 // Client represents a Mainflux client. Each client is owned by one user, and
 // it is assigned with the unique identifier and (temporary) access key.
 type Client struct {
-	Owner       string            `json:"-"`
-	ID          string            `json:"id"`
-	Type        string            `json:"type"`
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Key         string            `json:"key"`
-	Meta        map[string]string `json:"meta"`
+	Owner string            `json:"-"`
+	ID    string            `json:"id"`
+	Type  string            `json:"type"`
+	Name  string            `json:"name"`
+	Key   string            `json:"key"`
+	Meta  map[string]string `json:"meta"`
 }
-
-const nameLength int = 50
 
 var clientTypes map[string]bool = map[string]bool{
 	"app":    true,
@@ -22,10 +19,6 @@ var clientTypes map[string]bool = map[string]bool{
 }
 
 func (c *Client) validate() error {
-	if c.Name == "" || len(c.Name) > nameLength {
-		return ErrMalformedClient
-	}
-
 	if c.Type = strings.ToLower(c.Type); !clientTypes[c.Type] {
 		return ErrMalformedClient
 	}

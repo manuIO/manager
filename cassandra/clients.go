@@ -1,8 +1,6 @@
 package cassandra
 
 import (
-	"fmt"
-
 	"github.com/gocql/gocql"
 	"github.com/mainflux/manager"
 )
@@ -19,14 +17,13 @@ func NewClientRepository(session *gocql.Session) manager.ClientRepository {
 }
 
 func (repo *clientRepository) Save(client manager.Client) (string, error) {
-	cql := `INSERT INTO clients_by_user
-		(user, id, type, name, description, access_key, meta)
-		VALUES (?, ?, ?, ?, ?, ?, ?)`
+	cql := `INSERT INTO clients_by_user (user, id, type, name, access_key, meta)
+		VALUES (?, ?, ?, ?, ?, ?)`
 
 	id := gocql.TimeUUID()
 
-	if err := repo.session.Query(cql, client.Owner, id, client.Type,
-		client.Name, client.Description, client.Key, client.Meta).Exec(); err != nil {
+	if err := repo.session.Query(cql, client.Owner, id,
+		client.Type, client.Name, client.Key, client.Meta).Exec(); err != nil {
 		return "", err
 	}
 
@@ -34,11 +31,11 @@ func (repo *clientRepository) Save(client manager.Client) (string, error) {
 }
 
 func (repo *clientRepository) Update(client manager.Client) error {
-	cql := `UPDATE clients_by_user SET type = ?, name = ?, description = ?, meta = ?
+	cql := `UPDATE clients_by_user SET type = ?, name = ?, meta = ?
 		WHERE user = ? AND id = ? IF EXISTS`
 
-	applied, err := repo.session.Query(cql, client.Type, client.Name, client.Description,
-		client.Meta, client.Owner, client.ID).ScanCAS()
+	applied, err := repo.session.Query(cql, client.Type, client.Name, client.Meta,
+		client.Owner, client.ID).ScanCAS()
 
 	if !applied {
 		return manager.ErrNotFound
@@ -48,15 +45,13 @@ func (repo *clientRepository) Update(client manager.Client) error {
 }
 
 func (repo *clientRepository) One(owner string, id string) (manager.Client, error) {
-	cql := `SELECT type, name, description, access_key, meta
-		FROM clients_by_user
-		WHERE user = ? AND id = ? LIMIT 1`
+	cql := `SELECT type, name, access_key, meta
+		FROM clients_by_user WHERE user = ? AND id = ? LIMIT 1`
 
 	cli := manager.Client{}
 
 	if err := repo.session.Query(cql, owner, id).
-		Scan(&cli.Type, &cli.Name, &cli.Description, &cli.Key, &cli.Meta); err != nil {
-		fmt.Println(err)
+		Scan(&cli.Type, &cli.Name, &cli.Key, &cli.Meta); err != nil {
 		return cli, manager.ErrNotFound
 	}
 
@@ -66,11 +61,10 @@ func (repo *clientRepository) One(owner string, id string) (manager.Client, erro
 }
 
 func (repo *clientRepository) All(owner string) []manager.Client {
-	cql := `SELECT id, type, name, description, access_key, meta FROM clients_by_user WHERE user = ?`
+	cql := `SELECT id, type, name, access_key, meta FROM clients_by_user WHERE user = ?`
 	var id string
 	var cType string
 	var name string
-	var desc string
 	var key string
 	var meta map[string]string
 
@@ -80,15 +74,14 @@ func (repo *clientRepository) All(owner string) []manager.Client {
 
 	clients := make([]manager.Client, 0)
 
-	for iter.Scan(&id, &cType, &name, &desc, &key, &meta) {
+	for iter.Scan(&id, &cType, &name, &key, &meta) {
 		c := manager.Client{
-			Owner:       owner,
-			ID:          id,
-			Type:        cType,
-			Name:        name,
-			Description: desc,
-			Key:         key,
-			Meta:        meta,
+			Owner: owner,
+			ID:    id,
+			Type:  cType,
+			Name:  name,
+			Key:   key,
+			Meta:  meta,
 		}
 
 		clients = append(clients, c)
