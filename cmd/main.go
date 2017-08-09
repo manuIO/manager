@@ -62,11 +62,12 @@ func main() {
 
 	users := cassandra.NewUserRepository(session)
 	clients := cassandra.NewClientRepository(session)
+	channels := cassandra.NewChannelRepository(session)
 	hasher := bcrypt.NewHasher()
 	idp := jwt.NewIdentityProvider(cfg.Secret)
 
 	var svc manager.Service
-	svc = manager.NewService(users, clients, hasher, idp)
+	svc = manager.NewService(users, clients, channels, hasher, idp)
 	svc = api.NewLoggingService(logger, svc)
 	svc = api.NewMetricService(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{

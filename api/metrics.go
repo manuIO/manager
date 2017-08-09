@@ -52,6 +52,15 @@ func (ms *metricService) AddClient(key string, client manager.Client) (string, e
 	return ms.Service.AddClient(key, client)
 }
 
+func (ms *metricService) UpdateClient(key string, client manager.Client) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "update_client").Add(1)
+		ms.latency.With("method", "update_client").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.UpdateClient(key, client)
+}
+
 func (ms *metricService) ViewClient(key string, id string) (manager.Client, error) {
 	defer func(begin time.Time) {
 		ms.counter.With("method", "view_client").Add(1)
@@ -77,4 +86,67 @@ func (ms *metricService) RemoveClient(key string, id string) error {
 	}(time.Now())
 
 	return ms.Service.RemoveClient(key, id)
+}
+
+func (ms *metricService) CreateChannel(key string, channel manager.Channel) (string, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "create_channel").Add(1)
+		ms.latency.With("method", "create_channel").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.CreateChannel(key, channel)
+}
+
+func (ms *metricService) UpdateChannel(key string, channel manager.Channel) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "update_channel").Add(1)
+		ms.latency.With("method", "update_channel").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.UpdateChannel(key, channel)
+}
+
+func (ms *metricService) ViewChannel(key string, id string) (manager.Channel, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "view_channel").Add(1)
+		ms.latency.With("method", "view_channel").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.ViewChannel(key, id)
+}
+
+func (ms *metricService) ListChannels(key string) ([]manager.Channel, error) {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "list_channels").Add(1)
+		ms.latency.With("method", "list_channels").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.ListChannels(key)
+}
+
+func (ms *metricService) RemoveChannel(key string, id string) error {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "remove_channel").Add(1)
+		ms.latency.With("method", "remove_channel").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.RemoveChannel(key, id)
+}
+
+func (ms *metricService) CanRead(key string, id string) bool {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "can_read").Add(1)
+		ms.latency.With("method", "can_read").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.CanRead(key, id)
+}
+
+func (ms *metricService) CanWrite(key string, id string) bool {
+	defer func(begin time.Time) {
+		ms.counter.With("method", "can_write").Add(1)
+		ms.latency.With("method", "can_write").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return ms.Service.CanWrite(key, id)
 }

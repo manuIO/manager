@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	users   manager.UserRepository   = mocks.NewUserRepository()
-	clients manager.ClientRepository = mocks.NewClientRepository()
-	hasher  manager.Hasher           = mocks.NewHasher()
-	idp     manager.IdentityProvider = mocks.NewIdentityProvider()
-	svc     manager.Service          = manager.NewService(users, clients, hasher, idp)
+	users    manager.UserRepository    = mocks.NewUserRepository()
+	clients  manager.ClientRepository  = mocks.NewClientRepository()
+	channels manager.ChannelRepository = mocks.NewChannelRepository()
+	hasher   manager.Hasher            = mocks.NewHasher()
+	idp      manager.IdentityProvider  = mocks.NewIdentityProvider()
+	svc      manager.Service           = manager.NewService(users, clients, channels, hasher, idp)
 )
 
 func TestRegister(t *testing.T) {

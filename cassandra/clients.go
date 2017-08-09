@@ -33,6 +33,10 @@ func (repo *clientRepository) Save(client manager.Client) (string, error) {
 	return id.String(), nil
 }
 
+func (repo *clientRepository) Update(client manager.Client) error {
+	return nil
+}
+
 func (repo *clientRepository) One(owner string, id string) (manager.Client, error) {
 	cql := `SELECT type, name, description, access_key, meta
 		FROM clients_by_user

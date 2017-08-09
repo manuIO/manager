@@ -40,6 +40,10 @@ type ClientRepository interface {
 	// returned to indicate operation failure.
 	Save(Client) (string, error)
 
+	// Update performs an update to the existing client. A non-nil error is
+	// returned to indicate operation failure.
+	Update(Client) error
+
 	// One retrieves the client having the provided identifier, that is owned
 	// by the specified user.
 	One(string, string) (Client, error)

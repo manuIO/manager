@@ -40,7 +40,11 @@ func (cr *clientRepositoryMock) Save(client manager.Client) (string, error) {
 	return client.ID, nil
 }
 
-func (cr *clientRepositoryMock) One(owner string, id string) (manager.Client, error) {
+func (cr *clientRepositoryMock) Update(client manager.Client) error {
+	return nil
+}
+
+func (cr *clientRepositoryMock) One(owner, id string) (manager.Client, error) {
 	client := manager.Client{
 		ID:    id,
 		Owner: owner,
@@ -67,7 +71,7 @@ func (cr *clientRepositoryMock) All(owner string) []manager.Client {
 	return clients
 }
 
-func (cr *clientRepositoryMock) Remove(owner string, id string) error {
+func (cr *clientRepositoryMock) Remove(owner, id string) error {
 	client := manager.Client{
 		ID:    id,
 		Owner: owner,

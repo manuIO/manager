@@ -36,15 +36,48 @@ type Service interface {
 	// AddClient adds new client to the user identified by the provided key.
 	AddClient(string, Client) (string, error)
 
+	// UpdateClient updates the client identified by the provided ID, that
+	// belongs to the user identified by the provided key.
+	UpdateClient(string, Client) error
+
 	// ViewClient retrieves data about the client identified with the provided
 	// ID, that belongs to the user identified by the provided key.
 	ViewClient(string, string) (Client, error)
 
-	// ListClients retrieves data about all clients that belong to the user
-	// identifier by the provided key.
+	// ListClients retrieves data about all clients that belongs to the user
+	// identified by the provided key.
 	ListClients(string) ([]Client, error)
 
-	// RemoveClient removes client identified with the provided ID, that
+	// RemoveClient removes the client identified with the provided ID, that
 	// belongs to the user identified by the provided key.
 	RemoveClient(string, string) error
+
+	// CreateChannel adds new channel to the user identified by the provided key.
+	CreateChannel(string, Channel) (string, error)
+
+	// UpdateChannel updates the channel identified by the provided ID, that
+	// belongs to the user identified by the provided key.
+	UpdateChannel(string, Channel) error
+
+	// ViewChannel retrieves data about the channel identified by the provided
+	// ID, that belongs to the user identified by the provided key.
+	ViewChannel(string, string) (Channel, error)
+
+	// ListChannels retrieves data about all clients that belongs to the user
+	// identified by the provided key.
+	ListChannels(string) ([]Channel, error)
+
+	// RemoveChannel removes the client identified by the provided ID, that
+	// belongs to the user identified by the provided key.
+	RemoveChannel(string, string) error
+
+	// CanRead determines whether or not messages can be read by the client
+	// identified with the provided key from channel identified by the provided
+	// ID.
+	CanRead(string, string) bool
+
+	// CanWrite determines whether or not message can be written to the channel
+	// identified by the provided ID by the client identified with the provided
+	// key.
+	CanWrite(string, string) bool
 }

@@ -3,19 +3,22 @@ package manager
 var _ Service = (*managerService)(nil)
 
 type managerService struct {
-	users   UserRepository
-	clients ClientRepository
-	hasher  Hasher
-	idp     IdentityProvider
+	users    UserRepository
+	clients  ClientRepository
+	channels ChannelRepository
+	hasher   Hasher
+	idp      IdentityProvider
 }
 
 // NewService instantiates the domain service implementation.
-func NewService(ur UserRepository, cr ClientRepository, hasher Hasher, idp IdentityProvider) Service {
+func NewService(users UserRepository, clients ClientRepository, channels ChannelRepository,
+	hasher Hasher, idp IdentityProvider) Service {
 	return &managerService{
-		users:   ur,
-		clients: cr,
-		hasher:  hasher,
-		idp:     idp,
+		users:    users,
+		clients:  clients,
+		channels: channels,
+		hasher:   hasher,
+		idp:      idp,
 	}
 }
 
@@ -62,7 +65,11 @@ func (ms *managerService) AddClient(key string, client Client) (string, error) {
 	return ms.clients.Save(client)
 }
 
-func (ms *managerService) ViewClient(key string, id string) (Client, error) {
+func (ms *managerService) UpdateClient(key string, client Client) error {
+	return nil
+}
+
+func (ms *managerService) ViewClient(key, id string) (Client, error) {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return Client{}, err
@@ -80,11 +87,39 @@ func (ms *managerService) ListClients(key string) ([]Client, error) {
 	return ms.clients.All(sub), nil
 }
 
-func (ms *managerService) RemoveClient(key string, id string) error {
+func (ms *managerService) RemoveClient(key, id string) error {
 	sub, err := ms.idp.Identity(key)
 	if err != nil {
 		return err
 	}
 
 	return ms.clients.Remove(sub, id)
+}
+
+func (ms *managerService) CreateChannel(key string, channel Channel) (string, error) {
+	return "", nil
+}
+
+func (ms *managerService) UpdateChannel(key string, channel Channel) error {
+	return nil
+}
+
+func (ms *managerService) ViewChannel(key, id string) (Channel, error) {
+	return Channel{}, nil
+}
+
+func (ms *managerService) ListChannels(key string) ([]Channel, error) {
+	return make([]Channel, 0), nil
+}
+
+func (ms *managerService) RemoveChannel(key, id string) error {
+	return nil
+}
+
+func (ms *managerService) CanRead(key, id string) bool {
+	return false
+}
+
+func (ms *managerService) CanWrite(key, id string) bool {
+	return false
 }

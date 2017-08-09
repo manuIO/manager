@@ -24,8 +24,8 @@ func (ls *loggingService) Register(user manager.User) (err error) {
 		ls.logger.Log(
 			"method", "register",
 			"email", user.Email,
-			"took", time.Since(begin),
 			"error", err,
+			"took", time.Since(begin),
 		)
 	}(time.Now())
 
@@ -37,8 +37,8 @@ func (ls *loggingService) Login(user manager.User) (token string, err error) {
 		ls.logger.Log(
 			"method", "login",
 			"email", user.Email,
-			"took", time.Since(begin),
 			"error", err,
+			"took", time.Since(begin),
 		)
 	}(time.Now())
 
@@ -49,22 +49,38 @@ func (ls *loggingService) AddClient(key string, client manager.Client) (id strin
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "add_client",
+			"key", key,
 			"id", id,
-			"took", time.Since(begin),
 			"error", err,
+			"took", time.Since(begin),
 		)
 	}(time.Now())
 
 	return ls.Service.AddClient(key, client)
 }
 
+func (ls *loggingService) UpdateClient(key string, client manager.Client) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "update_client",
+			"key", key,
+			"id", client.ID,
+			"error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.UpdateClient(key, client)
+}
+
 func (ls *loggingService) ViewClient(key string, id string) (client manager.Client, err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "view_client",
+			"key", key,
 			"id", id,
-			"took", time.Since(begin),
 			"error", err,
+			"took", time.Since(begin),
 		)
 	}(time.Now())
 
@@ -76,8 +92,8 @@ func (ls *loggingService) ListClients(key string) (clients []manager.Client, err
 		ls.logger.Log(
 			"method", "list_clients",
 			"key", key,
-			"took", time.Since(begin),
 			"error", err,
+			"took", time.Since(begin),
 		)
 	}(time.Now())
 
@@ -88,11 +104,109 @@ func (ls *loggingService) RemoveClient(key string, id string) (err error) {
 	defer func(begin time.Time) {
 		ls.logger.Log(
 			"method", "remove_client",
+			"key", key,
 			"id", id,
-			"took", time.Since(begin),
 			"error", err,
+			"took", time.Since(begin),
 		)
 	}(time.Now())
 
 	return ls.Service.RemoveClient(key, id)
+}
+
+func (ls *loggingService) CreateChannel(key string, channel manager.Channel) (id string, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "create_channel",
+			"key", key,
+			"id", id,
+			"error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.CreateChannel(key, channel)
+}
+
+func (ls *loggingService) UpdateChannel(key string, channel manager.Channel) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "update_channel",
+			"key", key,
+			"id", channel.ID,
+			"error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.UpdateChannel(key, channel)
+}
+
+func (ls *loggingService) ViewChannel(key string, id string) (channel manager.Channel, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "view_channel",
+			"key", key,
+			"id", id,
+			"error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.ViewChannel(key, id)
+}
+
+func (ls *loggingService) ListChannels(key string) (channels []manager.Channel, err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "list_channels",
+			"key", key,
+			"error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.ListChannels(key)
+}
+
+func (ls *loggingService) RemoveChannel(key string, id string) (err error) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "remove_channel",
+			"key", key,
+			"id", id,
+			"error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.RemoveChannel(key, id)
+}
+
+func (ls *loggingService) CanRead(key string, id string) (allowed bool) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "can_read",
+			"key", key,
+			"id", id,
+			"allowed", allowed,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.CanRead(key, id)
+}
+
+func (ls *loggingService) CanWrite(key string, id string) (allowed bool) {
+	defer func(begin time.Time) {
+		ls.logger.Log(
+			"method", "can_write",
+			"key", key,
+			"id", id,
+			"allowed", allowed,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	return ls.Service.CanWrite(key, id)
 }
