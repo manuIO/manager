@@ -27,8 +27,9 @@ paths:
         201:
           description: Registered new user.
         400:
-          description: |
-            Failed due to malformed JSON or using an existing email address.
+          description: Failed due to malformed JSON.
+        409:
+          description: Failed due to using an existing email address.
         500:
           $ref: "#/responses/ServiceError"
   /tokens:

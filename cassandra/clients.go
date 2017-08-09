@@ -34,7 +34,17 @@ func (repo *clientRepository) Save(client manager.Client) (string, error) {
 }
 
 func (repo *clientRepository) Update(client manager.Client) error {
-	return nil
+	cql := `UPDATE clients_by_user SET type = ?, name = ?, description = ?, meta = ?
+		WHERE user = ? AND id = ? IF EXISTS`
+
+	applied, err := repo.session.Query(cql, client.Type, client.Name, client.Description,
+		client.Meta, client.Owner, client.ID).ScanCAS()
+
+	if !applied {
+		return manager.ErrNotFound
+	}
+
+	return err
 }
 
 func (repo *clientRepository) One(owner string, id string) (manager.Client, error) {
@@ -68,7 +78,7 @@ func (repo *clientRepository) All(owner string) []manager.Client {
 	iter := repo.session.Query(cql, owner).Iter()
 	defer iter.Close()
 
-	var clients []manager.Client
+	clients := make([]manager.Client, 0)
 
 	for iter.Scan(&id, &cType, &name, &desc, &key, &meta) {
 		c := manager.Client{

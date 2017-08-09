@@ -30,14 +30,27 @@ func loginEndpoint(svc manager.Service) endpoint.Endpoint {
 
 func addClientEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(addClientReq)
+		req := request.(clientReq)
 
 		id, err := svc.AddClient(req.key, req.client)
 		if err != nil {
 			return nil, err
 		}
 
-		return addClientRes{id}, nil
+		return clientRes{id: id, created: true}, nil
+	}
+}
+
+func updateClientEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(clientReq)
+		req.client.ID = req.id
+
+		if err := svc.UpdateClient(req.key, req.client); err != nil {
+			return nil, err
+		}
+
+		return clientRes{id: req.id, created: false}, nil
 	}
 }
 

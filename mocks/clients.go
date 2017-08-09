@@ -28,10 +28,6 @@ func (cr *clientRepositoryMock) Save(client manager.Client) (string, error) {
 	cr.mu.Lock()
 	defer cr.mu.Unlock()
 
-	if c, ok := cr.clients[key(client)]; ok {
-		return c.ID, nil
-	}
-
 	cr.counter += 1
 	client.ID = strconv.Itoa(cr.counter)
 
@@ -41,6 +37,15 @@ func (cr *clientRepositoryMock) Save(client manager.Client) (string, error) {
 }
 
 func (cr *clientRepositoryMock) Update(client manager.Client) error {
+	cr.mu.Lock()
+	defer cr.mu.Unlock()
+
+	if _, ok := cr.clients[key(client)]; !ok {
+		return manager.ErrNotFound
+	}
+
+	cr.clients[key(client)] = client
+
 	return nil
 }
 

@@ -35,7 +35,7 @@ func MakeHandler(svc manager.Service) http.Handler {
 
 	r.Post("/clients", kithttp.NewServer(
 		addClientEndpoint(svc),
-		decodeAddClient,
+		decodeClient,
 		encodeResponse,
 		opts...,
 	))
@@ -43,6 +43,13 @@ func MakeHandler(svc manager.Service) http.Handler {
 	r.Get("/clients/:id", kithttp.NewServer(
 		viewClientEndpoint(svc),
 		decodeView,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Put("/clients/:id", kithttp.NewServer(
+		updateClientEndpoint(svc),
+		decodeClient,
 		encodeResponse,
 		opts...,
 	))
@@ -75,14 +82,15 @@ func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) 
 	return user, nil
 }
 
-func decodeAddClient(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeClient(_ context.Context, r *http.Request) (interface{}, error) {
 	var client manager.Client
 	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
 		return nil, err
 	}
 
-	req := addClientReq{
+	req := clientReq{
 		key:    r.Header.Get("Authorization"),
+		id:     bone.GetValue(r, "id"),
 		client: client,
 	}
 

@@ -66,7 +66,18 @@ func (ms *managerService) AddClient(key string, client Client) (string, error) {
 }
 
 func (ms *managerService) UpdateClient(key string, client Client) error {
-	return nil
+	if err := client.validate(); err != nil {
+		return err
+	}
+
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return err
+	}
+
+	client.Owner = sub
+
+	return ms.clients.Update(client)
 }
 
 func (ms *managerService) ViewClient(key, id string) (Client, error) {

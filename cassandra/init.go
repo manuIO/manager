@@ -16,7 +16,7 @@ var tables []string = []string{
 		description text,
 		access_key text,
 		meta map<text, text>,
-		PRIMARY KEY ((user), id, type)
+		PRIMARY KEY ((user), id)
 	)`,
 	`CREATE TABLE IF NOT EXISTS channels_by_user (
 		user text,

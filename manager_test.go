@@ -62,8 +62,6 @@ func TestAddClient(t *testing.T) {
 	}{
 		{"foo@bar.com", manager.Client{Type: "app", Name: "a"}, "1", nil},
 		{"foo@bar.com", manager.Client{Type: "device", Name: "b"}, "2", nil},
-		{"foo@bar.com", manager.Client{Type: "app", Name: "c"}, "3", nil},
-		{"foo@bar.com", manager.Client{ID: "3", Type: "app", Name: "c"}, "3", nil},
 		{"", manager.Client{Type: "app", Name: "d"}, "", manager.ErrUnauthorizedAccess},
 		{"foo@bar.com", manager.Client{Type: "invalid", Name: "d"}, "", manager.ErrMalformedClient},
 	}
@@ -71,6 +69,25 @@ func TestAddClient(t *testing.T) {
 	for _, tc := range cases {
 		id, err := svc.AddClient(tc.key, tc.client)
 		assert.Equal(t, tc.id, id, "unexpected id retrieved")
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}
+
+func TestUpdateClient(t *testing.T) {
+	var cases = []struct {
+		key    string
+		client manager.Client
+		err    error
+	}{
+		{"foo@bar.com", manager.Client{ID: "1", Type: "app", Name: "aa"}, nil},
+		{"foo@bar.com", manager.Client{ID: "2", Type: "device", Name: "bb"}, nil},
+		{"", manager.Client{ID: "2", Type: "app", Name: "cc"}, manager.ErrUnauthorizedAccess},
+		{"foo@bar.com", manager.Client{ID: "2", Type: "invalid", Name: "d"}, manager.ErrMalformedClient},
+		{"foo@bar.com", manager.Client{ID: "3", Type: "app", Name: "d"}, manager.ErrNotFound},
+	}
+
+	for _, tc := range cases {
+		err := svc.UpdateClient(tc.key, tc.client)
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }

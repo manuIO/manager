@@ -15,8 +15,9 @@ type apiResponse interface {
 	empty() bool
 }
 
-type addClientReq struct {
+type clientReq struct {
 	key    string
+	id     string
 	client manager.Client
 }
 
@@ -47,21 +48,30 @@ func (res tokenRes) empty() bool {
 	return res.Token == ""
 }
 
-type addClientRes struct {
-	id string
+type clientRes struct {
+	id      string
+	created bool
 }
 
-func (res addClientRes) code() int {
-	return http.StatusCreated
-}
-
-func (res addClientRes) headers() map[string]string {
-	return map[string]string{
-		"Location": fmt.Sprint("/clients/", res.id),
+func (res clientRes) code() int {
+	if res.created {
+		return http.StatusCreated
 	}
+
+	return http.StatusOK
 }
 
-func (res addClientRes) empty() bool {
+func (res clientRes) headers() map[string]string {
+	if res.created {
+		return map[string]string{
+			"Location": fmt.Sprint("/clients/", res.id),
+		}
+	}
+
+	return map[string]string{}
+}
+
+func (res clientRes) empty() bool {
 	return true
 }
 
