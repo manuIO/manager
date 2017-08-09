@@ -48,15 +48,16 @@ func (repo *clientRepository) One(owner string, id string) (manager.Client, erro
 	cql := `SELECT type, name, access_key, meta
 		FROM clients_by_user WHERE user = ? AND id = ? LIMIT 1`
 
-	cli := manager.Client{}
+	cli := manager.Client{
+		Owner: owner,
+		ID:    id,
+	}
 
 	if err := repo.session.Query(cql, owner, id).
 		Scan(&cli.Type, &cli.Name, &cli.Key, &cli.Meta); err != nil {
 		return cli, manager.ErrNotFound
 	}
 
-	cli.Owner = owner
-	cli.ID = id
 	return cli, nil
 }
 

@@ -54,6 +54,20 @@ func (res tokenRes) empty() bool {
 	return res.Token == ""
 }
 
+type removeRes struct{}
+
+func (res removeRes) code() int {
+	return http.StatusNoContent
+}
+
+func (res removeRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res removeRes) empty() bool {
+	return true
+}
+
 type clientRes struct {
 	id      string
 	created bool
@@ -116,20 +130,6 @@ func (res listClientsRes) empty() bool {
 	return false
 }
 
-type removeClientRes struct{}
-
-func (res removeClientRes) code() int {
-	return http.StatusNoContent
-}
-
-func (res removeClientRes) headers() map[string]string {
-	return map[string]string{}
-}
-
-func (res removeClientRes) empty() bool {
-	return true
-}
-
 type channelRes struct {
 	id      string
 	created bool
@@ -155,4 +155,39 @@ func (res channelRes) headers() map[string]string {
 
 func (res channelRes) empty() bool {
 	return true
+}
+
+type viewChannelRes struct {
+	manager.Channel
+}
+
+func (res viewChannelRes) code() int {
+	return http.StatusOK
+}
+
+func (res viewChannelRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res viewChannelRes) empty() bool {
+	return false
+}
+
+type listChannelsRes struct {
+	Channels []manager.Channel `json:"channels"`
+	count    int
+}
+
+func (res listChannelsRes) code() int {
+	return http.StatusOK
+}
+
+func (res listChannelsRes) headers() map[string]string {
+	return map[string]string{
+		"X-Count": fmt.Sprintf("%d", res.count),
+	}
+}
+
+func (res listChannelsRes) empty() bool {
+	return false
 }

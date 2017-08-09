@@ -178,3 +178,53 @@ func TestUpdateChannel(t *testing.T) {
 		assert.Equal(t, tc.err, err, "unexpected error occurred")
 	}
 }
+
+func TestViewChannel(t *testing.T) {
+	var cases = []struct {
+		id  string
+		key string
+		err error
+	}{
+		{"1", "foo@bar.com", nil},
+		{"1", "", manager.ErrUnauthorizedAccess},
+		{"5", "foo@bar.com", manager.ErrNotFound},
+	}
+
+	for _, tc := range cases {
+		_, err := svc.ViewChannel(tc.key, tc.id)
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}
+
+func TestListChannels(t *testing.T) {
+	var cases = []struct {
+		key string
+		err error
+	}{
+		{"foo@bar.com", nil},
+		{"", manager.ErrUnauthorizedAccess},
+	}
+
+	for _, tc := range cases {
+		_, err := svc.ListChannels(tc.key)
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}
+
+func TestRemoveChannel(t *testing.T) {
+	var cases = []struct {
+		id  string
+		key string
+		err error
+	}{
+		{"1", "", manager.ErrUnauthorizedAccess},
+		{"1", "foo@bar.com", nil},
+		{"1", "foo@bar.com", nil},
+		{"2", "foo@bar.com", nil},
+	}
+
+	for _, tc := range cases {
+		err := svc.RemoveChannel(tc.key, tc.id)
+		assert.Equal(t, tc.err, err, "unexpected error occurred")
+	}
+}

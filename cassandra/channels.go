@@ -43,15 +43,57 @@ func (repo *channelRepository) Update(channel manager.Channel) error {
 }
 
 func (repo *channelRepository) One(owner, id string) (manager.Channel, error) {
-	return manager.Channel{}, nil
+	cql := `SELECT name, connected FROM channels_by_user WHERE user = ? AND id = ? LIMIT 1`
+
+	ch := manager.Channel{
+		Owner: owner,
+		ID:    id,
+	}
+
+	if err := repo.session.Query(cql, owner, id).Scan(&ch.Name, &ch.Connected); err != nil {
+		return ch, manager.ErrNotFound
+	}
+
+	return ch, nil
 }
 
 func (repo *channelRepository) All(owner string) []manager.Channel {
-	return make([]manager.Channel, 0)
+	cql := `SELECT id, name, connected FROM channels_by_user WHERE user = ?`
+	var id string
+	var name string
+	var connected []string
+
+	// NOTE: the closing might failed
+	iter := repo.session.Query(cql, owner).Iter()
+	defer iter.Close()
+
+	channels := make([]manager.Channel, 0)
+
+	for iter.Scan(&id, &name, &connected) {
+		c := manager.Channel{
+			Owner:     owner,
+			ID:        id,
+			Name:      name,
+			Connected: replaceNilWithEmpty(connected),
+		}
+
+		channels = append(channels, c)
+	}
+
+	return channels
+}
+
+func replaceNilWithEmpty(items []string) []string {
+	if items != nil {
+		return items
+	}
+
+	return make([]string, 0)
 }
 
 func (repo *channelRepository) Remove(owner, id string) error {
-	return nil
+	cql := `DELETE FROM channels_by_user WHERE user = ? AND id = ?`
+	return repo.session.Query(cql, owner, id).Exec()
 }
 
 func (repo *channelRepository) HasClient(owned, id, client string) bool {

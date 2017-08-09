@@ -40,13 +40,6 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	))
 
-	r.Get("/clients/:id", kithttp.NewServer(
-		viewClientEndpoint(svc),
-		decodeView,
-		encodeResponse,
-		opts...,
-	))
-
 	r.Put("/clients/:id", kithttp.NewServer(
 		updateClientEndpoint(svc),
 		decodeClient,
@@ -54,16 +47,23 @@ func MakeHandler(svc manager.Service) http.Handler {
 		opts...,
 	))
 
-	r.Get("/clients", kithttp.NewServer(
-		listClientsEndpoint(svc),
-		decodeList,
+	r.Delete("/clients/:id", kithttp.NewServer(
+		removeClientEndpoint(svc),
+		decodeView,
 		encodeResponse,
 		opts...,
 	))
 
-	r.Delete("/clients/:id", kithttp.NewServer(
-		removeClientEndpoint(svc),
+	r.Get("/clients/:id", kithttp.NewServer(
+		viewClientEndpoint(svc),
 		decodeView,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/clients", kithttp.NewServer(
+		listClientsEndpoint(svc),
+		decodeList,
 		encodeResponse,
 		opts...,
 	))
@@ -78,6 +78,27 @@ func MakeHandler(svc manager.Service) http.Handler {
 	r.Put("/channels/:id", kithttp.NewServer(
 		updateChannelEndpoint(svc),
 		decodeChannel,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Delete("/channels/:id", kithttp.NewServer(
+		removeChannelEndpoint(svc),
+		decodeView,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/channels/:id", kithttp.NewServer(
+		viewChannelEndpoint(svc),
+		decodeView,
+		encodeResponse,
+		opts...,
+	))
+
+	r.Get("/channels", kithttp.NewServer(
+		listChannelsEndpoint(svc),
+		decodeList,
 		encodeResponse,
 		opts...,
 	))

@@ -129,15 +129,30 @@ func (ms *managerService) UpdateChannel(key string, channel Channel) error {
 }
 
 func (ms *managerService) ViewChannel(key, id string) (Channel, error) {
-	return Channel{}, nil
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return Channel{}, err
+	}
+
+	return ms.channels.One(sub, id)
 }
 
 func (ms *managerService) ListChannels(key string) ([]Channel, error) {
-	return make([]Channel, 0), nil
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return ms.channels.All(sub), nil
 }
 
 func (ms *managerService) RemoveChannel(key, id string) error {
-	return nil
+	sub, err := ms.idp.Identity(key)
+	if err != nil {
+		return err
+	}
+
+	return ms.channels.Remove(sub, id)
 }
 
 func (ms *managerService) CanRead(key, id string) bool {

@@ -88,7 +88,7 @@ func removeClientEndpoint(svc manager.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		return removeClientRes{}, nil
+		return removeRes{}, nil
 	}
 }
 
@@ -115,5 +115,43 @@ func updateChannelEndpoint(svc manager.Service) endpoint.Endpoint {
 		}
 
 		return channelRes{id: req.id, created: false}, nil
+	}
+}
+
+func viewChannelEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(viewResourceReq)
+
+		channel, err := svc.ViewChannel(req.key, req.id)
+		if err != nil {
+			return nil, err
+		}
+
+		return viewChannelRes{channel}, nil
+	}
+}
+
+func listChannelsEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(listResourcesReq)
+
+		channels, err := svc.ListChannels(req.key)
+		if err != nil {
+			return nil, err
+		}
+
+		return listChannelsRes{channels, len(channels)}, nil
+	}
+}
+
+func removeChannelEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(viewResourceReq)
+
+		if err := svc.RemoveChannel(req.key, req.id); err != nil {
+			return nil, err
+		}
+
+		return removeRes{}, nil
 	}
 }
