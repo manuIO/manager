@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -20,27 +19,39 @@ import (
 )
 
 const (
-	port     int    = 8180
-	sep      string = ","
-	cluster  string = "127.0.0.1"
-	keyspace string = "manager"
-	secret   string = "token-secret"
+	port        int    = 8180
+	sep         string = ","
+	defCluster  string = "127.0.0.1"
+	defKeyspace string = "manager"
+	defSecret   string = "manager"
+	envCluster  string = "MANAGER_DB_CLUSTER"
+	envKeyspace string = "MANAGER_DB_KEYSPACE"
+	envSecret   string = "MANAGER_SECRET"
 )
 
-type flags struct {
+type config struct {
 	Port     int
 	Cluster  string
 	Keyspace string
 	Secret   string
 }
 
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return fallback
+	}
+
+	return value
+}
+
 func main() {
-	var cfg flags
-	flag.IntVar(&cfg.Port, "port", port, "HTTP server port")
-	flag.StringVar(&cfg.Cluster, "cluster", cluster, "comma-separated cluster addresses")
-	flag.StringVar(&cfg.Keyspace, "keyspace", keyspace, "cassandra keyspace to use")
-	flag.StringVar(&cfg.Secret, "secret", secret, "access token signing secret")
-	flag.Parse()
+	cfg := config{
+		Port:     port,
+		Cluster:  getenv(envCluster, defCluster),
+		Keyspace: getenv(envKeyspace, defKeyspace),
+		Secret:   getenv(envSecret, defSecret),
+	}
 
 	var logger log.Logger
 	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
