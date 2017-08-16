@@ -55,19 +55,19 @@ services:
       MANAGER_SECRET: [string used for signing tokens]
 ```
 
-Alternatively, the service can be used outside of the container. Execute the
-following command to download the latest version of the service:
+To start the service outside of the container, execute the following shell script:
 
 ```bash
+# download the latest version of the service
 go get github.com/mainflux/manager
-```
 
-Once downloaded, the code can be compiled, installed to `$GOBIN` and executed
-in the following manner:
+cd $GOPATH/github.com/mainflux/manager/cmd
 
-```bash
-MANAGER_DB_CLUSTER=[comma-separated Cassandra endpoints] MANAGER_DB_KEYSPACE=[name of Cassandra
-keyspace] MANAGER_SECRET=[string used for signing tokens] manager
+# compile the app; make sure to set the proper GOOS value
+CGO_ENABLED=0 GOOS=[platform identifier] go build -ldflags "-s" -a -installsuffix cgo -o app
+
+# set the environment variables and run the service
+MANAGER_DB_CLUSTER=[comma-separated Cassandra endpoints] MANAGER_DB_KEYSPACE=[name of Cassandra keyspace] MANAGER_SECRET=[string used for signing tokens] app
 ```
 
 ## Usage

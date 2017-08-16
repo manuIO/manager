@@ -1,6 +1,5 @@
 .git/
 .travis.yml
-docker-compose.dev.yml
 glide.lock
 glide.yaml
 LICENSE
