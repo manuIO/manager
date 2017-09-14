@@ -15,6 +15,24 @@ type apiResponse interface {
 	empty() bool
 }
 
+// Health
+type healthReq struct {}
+ 
+type healthRes struct {}
+
+func (res healthRes) headers() map[string]string {
+	return map[string]string{}
+}
+
+func (res healthRes) code() int {
+	return http.StatusOK
+}
+
+func (res healthRes) empty() bool {
+	return true
+}
+
+// Client
 type clientReq struct {
 	key    string
 	id     string

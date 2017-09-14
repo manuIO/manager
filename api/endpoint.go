@@ -7,6 +7,12 @@ import (
 	"github.com/mainflux/manager"
 )
 
+func healthEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		return healthRes{}, nil
+	}
+}
+
 func registrationEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		user := request.(manager.User)
