@@ -19,6 +19,13 @@ func MakeHandler(svc manager.Service) http.Handler {
 
 	r := bone.New()
 
+	r.Get("/info", kithttp.NewServer(
+		infoEndpoint(svc),
+		decodeInfo,
+		encodeResponse,
+		opts...,
+	))
+
 	r.Post("/users", kithttp.NewServer(
 		registrationEndpoint(svc),
 		decodeCredentials,
@@ -120,6 +127,11 @@ func MakeHandler(svc manager.Service) http.Handler {
 	r.Handle("/metrics", promhttp.Handler())
 
 	return r
+}
+
+func decodeInfo(_ context.Context, r *http.Request) (interface{}, error) {
+	req := infoReq{}
+	return req, nil
 }
 
 func decodeCredentials(_ context.Context, r *http.Request) (interface{}, error) {
