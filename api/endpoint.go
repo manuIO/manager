@@ -7,6 +7,17 @@ import (
 	"github.com/mainflux/manager"
 )
 
+func infoEndpoint(svc manager.Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		info, err := svc.Info()
+		if err != nil {
+			return nil, err
+		}
+
+		return infoRes{Version: info.Version}, nil
+	}
+}
+
 func registrationEndpoint(svc manager.Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		user := request.(manager.User)
