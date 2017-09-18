@@ -57,6 +57,8 @@ func main() {
 	logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
+	logger.Log("start", "manager")
+
 	var fields = []string{"method"}
 
 	session, err := cassandra.Connect(strings.Split(cfg.Cluster, sep), cfg.Keyspace)
@@ -98,6 +100,7 @@ func main() {
 
 	errs := make(chan error, 2)
 
+	logger.Log("http_port", cfg.Port)
 	go func() {
 		p := fmt.Sprintf(":%d", cfg.Port)
 		errs <- http.ListenAndServe(p, api.MakeHandler(svc))
